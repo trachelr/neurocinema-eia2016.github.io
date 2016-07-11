@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html >
+    <head>
+        <meta charset="UTF-8">
+        <title>An emotion-based video player</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/emoticon.css">
+        <link type="text/css" rel="stylesheet" href="css/video-js.min.css" />
+        <script>
+            // getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
+            if (window.location.protocol == "file:") {
+                alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
+            } else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
+                window.location.protocol = "https";
+            }
+        </script>
+
+    </head>
+    <body>
+    <script src="./js/video.js/video.min.js"></script>
+    <script src="./js/video-js/video.js"></script>
+    <script src="./js/Youtube.min.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/clmtrackr/clm.js"></script>
+    <script src="./js/clmtrackr/clmtrackr.js"></script>
+    <script src="./js/models/model_pca_20_svm_emotionDetection.js"></script>
+    <script src="./js/clmtrackr/Stats.js"></script>
+    <script src="./js/models/d3.min.js"></script>
+    <script src="./js/models/emotion_classifier.js"></script>
+    <script src="./js/models/emotionmodel.js"></script>
+    <div id="container">
+        <video id="videoel" width="400" height="300" preload="auto" loop></video>
+        <canvas id="overlay" width="400" height="300"></canvas>
+    </div>
+    <div id="emotion_container">
+        <div id="emotion_icons">
+            <img class="emotion_icon" id="icon1" src="./media/icons/angry.png">
+            <img class="emotion_icon" id="icon2" src="./media/icons/sad.png">
+            <img class="emotion_icon" id="icon3" src="./media/icons/surprised.png">
+            <img class="emotion_icon" id="icon4" src="./media/icons/happy.png">
+        </div>
+        <div id='emotion_chart'></div>
+    </div>
+        <div id="controls">
+        <input class="btn" type="button" value="wait, loading video" disabled="disabled" onclick="startVideo()" id="startbutton"></input>
+        <input class="btn" type="button" value="wait, calibrating model" disabled="disabled" onclick="startPlayer()" id="startplayer"></input>
+    </div>
+
+    <figure id="youtube_player">
+        <video
+            id="vid1"
+            class="video-js vjs-default-skin"
+            controls
+            width="800" height="400"
+            data-setup='{ "techOrder": ["youtube"], "sources": [{"type": "video/youtube", "src": "https://www.youtube.com/watch?v=QlooZ3FQR40"}] }'
+        >
+        </video>
+    </figure>
+
+    <script>
+        // An example of playing with the Video.js javascript API
+        // You can look at the doc there: http://docs.videojs.com/docs/guides/api.html
+        videojs('vid1').ready(function() {
+            var myPlayer = this;
+            myPlayer.src({ type: "video/youtube", src: "https://www.youtube.com/watch?v=QlooZ3FQR40" });
+        });
+    </script>
+    <script src="js/index.js"></script>
+    <script>
+        var video_player = document.getElementById('youtube_player');
+        var video = document.querySelector("#youtube_player video");
+        var vid = document.getElementById('videoel');
+        var overlay = document.getElementById('overlay');
+        var overlayCC = overlay.getContext('2d');
+        var sources = video_player.getElementsByTagName('a');
+
+        /********** check and set up video/webcam **********/
+
+        function enablestart() {
+            var startbutton = document.getElementById('startbutton');
+            startbutton.value = "start";
+            startbutton.disabled = null;
+        }
+        
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
+
+        // check for camerasupport
+        if (navigator.getUserMedia) {
+            // set up stream
+            
+            var videoSelector = {video : true};
+            if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
+                var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+                if (chromeVersion < 20) {
+                    videoSelector = "video";
+                }
+            };
+        
+            navigator.getUserMedia(videoSelector, function( stream ) {
+                if (vid.mozCaptureStream) {
+                    vid.mozSrcObject = stream;
+                } else {
+                    vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+                }
+                vid.play();
+            }, function() {
+                //insertAltVideo(vid);
+                alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
+            });
+        } else {
+            //insertAltVideo(vid);
+            alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
+        }
+
+        vid.addEventListener('canplay', enablestart, false);
+        
+        /*********** setup of emotion detection *************/
+
+        var ctrack = new clm.tracker({useWebGL : true});
+        ctrack.init(pModel);
+
+        function startVideo() {
+            // start video
+            vid.play();
+            // start tracking
+            ctrack.start(vid);
+            // start loop to draw face
+            drawLoop();
+        }
+
+        function startPlayer() {
+            // load video
+            video.load();
+            // start playing
+            video.play();
+        }
+
+        function writeUserData(videoID, timestamp, er) {
+            firebase.database().ref('users/' + videoID).set({
+                timestamp: timestamp,
+                angry: er[0],
+                sad: er[1],
+                surprised: er[2],
+                happy: er[3]
+            });
+        }
+        function drawLoop() {
+            requestAnimFrame(drawLoop);
+            overlayCC.clearRect(0, 0, 400, 300);
+            //psrElement.innerHTML = "score :" + ctrack.getScore().toFixed(4);
+            if (ctrack.getCurrentPosition()) {
+                ctrack.draw(overlay);
+            }
+            var cp = ctrack.getCurrentParameters();
+            var emotion_names = ["angry", "sad", "surprised", "happy"]
+            var er = ec.meanPredict(cp);
+            var ts = videojs('vid1').currentTime();
+            if (er) {
+                updateData(er);
+                for (var i = 0;i < er.length;i++) {
+                    writeUserData('test_vid_'+ts, ts, er)
+                    if (er[i].value > 0.8) {
+                        document.getElementById('icon'+(i+1)).style.visibility = 'visible';
+                    } else {
+                        document.getElementById('icon'+(i+1)).style.visibility = 'hidden';
+                    }
+                }
+            }
+        }
+        
+        var ec = new emotionClassifier();
+        ec.init(emotionModel);
+        var emotionData = ec.getBlank();    
+        
+        /************ d3 code for barchart *****************/
+
+        var margin = {top : 20, right : 20, bottom : 10, left : 40},
+            width = 400 - margin.left - margin.right,
+            height = 100 - margin.top - margin.bottom;
+
+        var barWidth = 30;
+
+        var formatPercent = d3.format(".0%");
+        
+        var x = d3.scale.linear()
+            .domain([0, ec.getEmotions().length]).range([margin.left, width+margin.left]);
+
+        var y = d3.scale.linear()
+            .domain([0,1]).range([0, height]);
+
+        var svg = d3.select("#emotion_chart").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        
+        svg.selectAll("rect").
+          data(emotionData).
+          enter().
+          append("svg:rect").
+          attr("x", function(datum, index) { return x(index); }).
+          attr("y", function(datum) { return height - y(datum.value); }).
+          attr("height", function(datum) { return y(datum.value); }).
+          attr("width", barWidth).
+          attr("fill", "#2d578b");
+
+        svg.selectAll("text.labels").
+          data(emotionData).
+          enter().
+          append("svg:text").
+          attr("x", function(datum, index) { return x(index) + barWidth; }).
+          attr("y", function(datum) { return height - y(datum.value); }).
+          attr("dx", -barWidth/2).
+          attr("dy", "1.2em").
+          attr("text-anchor", "middle").
+          text(function(datum) { return datum.value;}).
+          attr("fill", "white").
+          attr("class", "labels");
+        
+        svg.selectAll("text.yAxis").
+          data(emotionData).
+          enter().append("svg:text").
+          attr("x", function(datum, index) { return x(index) + barWidth; }).
+          attr("y", height).
+          attr("dx", -barWidth/2).
+          attr("text-anchor", "middle").
+          attr("style", "font-size: 12").
+          text(function(datum) { return datum.emotion;}).
+          attr("transform", "translate(0, 18)").
+          attr("class", "yAxis");
+
+        function updateData(data) {
+            // update
+            var rects = svg.selectAll("rect")
+                .data(data)
+                .attr("y", function(datum) { return height - y(datum.value); })
+                .attr("height", function(datum) { return y(datum.value); });
+            var texts = svg.selectAll("text.labels")
+                .data(data)
+                .attr("y", function(datum) { return height - y(datum.value); })
+                .text(function(datum) { return datum.value.toFixed(1);});
+
+            // enter 
+            rects.enter().append("svg:rect");
+            texts.enter().append("svg:text");
+
+            // exit
+            rects.exit().remove();
+            texts.exit().remove();
+        }
+
+        /******** stats ********/
+
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        document.getElementById('container').appendChild( stats.domElement );
+
+        // update stats on every iteration
+        document.addEventListener('clmtrackrIteration', function(event) {
+            stats.update();
+        }, false);
+        
+        </script>
+        <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
+        <script>
+          // Initialize Firebase
+          var config = {
+            apiKey: "AIzaSyBI1lAq_sWUkSyuw6_q9Tp4Xq57pTqQLUU",
+            authDomain: "neurocinema-a859d.firebaseapp.com",
+            databaseURL: "https://neurocinema-a859d.firebaseio.com",
+            storageBucket: "neurocinema-a859d.appspot.com",
+          };
+          firebase.initializeApp(config);
+        </script>
+    </body>
+</html>
