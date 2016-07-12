@@ -1,0 +1,41 @@
+{
+	"algorithm":"clmtrackr",
+	"id":"happy",
+	"localisation": [
+		{
+			"sublocalisations": 
+				{
+					"localisation": [
+						{
+							"tcin":"00:00:17.5891",
+							"tclevel":1,
+							"tcout":"00:00:23.3476"
+						},
+						{
+							"tcin":"00:00:24.1580",
+							"tclevel":1,
+							"tcout":"00:00:25.2858"
+						},
+						{
+							"tcin":"00:00:27.3206",
+							"tclevel":1,
+							"tcout":"00:00:29.3206"
+						},
+						{
+							"tcin":"00:00:31.3670",
+							"tclevel":1,
+							"tcout":"00:00:33.3670"
+						}
+					]
+				},
+			"tcin":"00:00:00.0000",
+			"tclevel":0,
+			"tcout":"00:40:00.0000",
+			"type":"segments"
+		}
+	],
+	"processed":20160712,
+	"processor":"R. Trachel",
+	"type":"segments",
+	"version":1
+}

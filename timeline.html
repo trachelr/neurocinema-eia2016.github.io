@@ -6,15 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="images/favicon.ico">
         <link href="css/default.css" rel="stylesheet">
-        <script src="./js/jquery/dist/jquery.js"></script>
-        <script src="./js/jquery-ui/jquery-ui.min.js"></script>        
-        <script src="./js/raphael/raphael.js"></script>
+        <script src="js/jquery/dist/jquery.js"></script>
+        <script src="js/jquery-ui/jquery-ui.min.js"></script>        
+        <script src="js/raphael/raphael.js"></script>
         <!-- style-player -->        
-        <link href="../css/amalia.js.min.css" rel="stylesheet">
+        <link href="css/amalia.js.min.css" rel="stylesheet">
         <!-- /style-player -->        
         <!-- script-player -->        
-        <script src="../js/amalia.js.min.js"></script>
-        <script src="../js/amalia.js-plugin-timeline.min.js"></script>       
+        <script src="js/amalia.js/amalia.js.min.js"></script>
+        <script src="js/amalia.js/amalia.js-plugin-timeline.min.js"></script>       
         <!-- /script-player -->
     </head>
     <body>
@@ -39,8 +39,9 @@
                                     },
                                 plugins : {
                                     dataServices : [
-                                        'json/amalia01-ball.json',
-                                        'json/amalia-faces.json'
+                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/happy.json',
+                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/sad.json',
+                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/surprised.json'
                                     ],
                                     list : [
                                         {
@@ -49,16 +50,22 @@
                                             'parameters' : {
                                                 listOfLines : [
                                                     {
-                                                        title : 'Ball moving up',
+                                                        title : 'Happy face',
                                                         type : 'segment',
-                                                        metadataId : 'ball-amalia01',
+                                                        metadataId : 'happy',
                                                         color : '#F00'
                                                     },
                                                     {
-                                                        title : 'Face detection',
+                                                        title : 'Sad face',
                                                         type : 'segment',
-                                                        metadataId : 'faces-amalia',
-                                                        color : '#A31'
+                                                        metadataId : 'sad',
+                                                        color : '#4A0'
+                                                    },
+                                                    {
+                                                        title : 'Surprised face',
+                                                        type : 'segment',
+                                                        metadataId : 'surprised',
+                                                        color : '#340'
                                                     }
                                                 ]
                                             }

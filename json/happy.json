@@ -1,0 +1,25 @@
+{
+	"algorithm":"clmtrackr",
+	"id":"happy",
+	"localisation": [
+	{
+		"sublocalisations":
+		{
+			"localisation": [
+			{
+                "tcin":"00:0:34.8879",
+                "tclevel":1,
+                "tcout":"00:0:36.2347"
+            }
+            ],
+            "tcin":"00:00:00.0000",
+            "tclevel":0,
+            "tcout":"00:20:00.0000",
+            "type":"segments"
+        }
+    }],
+    "processed":"20160712T093401525Z",
+    "processor":"R. Trachel",
+    "type":"segments",
+    "version":1
+}

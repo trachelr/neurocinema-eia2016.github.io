@@ -1,0 +1,30 @@
+{
+    "localisation": [
+        {
+            "sublocalisations": {
+                "localisation": [
+                    { 
+                        "tcin":"00:00:03.070371",
+                        "tclevel":1,
+                        "tcout":"00:00:08.060866"
+                    },
+                    {
+                        "tcin":"00:00:11.081188",
+                        "tclevel":1,
+                        "tcout":"00:00:13.001303"
+                    }
+                ]
+            },
+            "tcin":"00:00:00.0000",
+            "tcout":"00:01:00.0000",
+            "type":"segments",
+            "tclevel":0
+        }
+    ],
+    "type": "segments",
+    "id": "happy",
+    "algorithm": "clmtrackr",
+    "processor": "R. Trachel",
+    "processed": 20160712,
+    "version": 1
+}

@@ -1,0 +1,26 @@
+{
+	"algorithm":"clmtrackr",
+	"id":"angry",
+	"localisation": [
+		{
+			"sublocalisations": 
+				{
+					"localisation": [
+						{
+							"tcin":"00:00:11.8305",
+							"tclevel":1,
+							"tcout":"00:00:17.5542"
+						}
+					]
+				},
+			"tcin":"00:00:00.0000",
+			"tclevel":0,
+			"tcout":"00:20:00.0000",
+			"type":"segments"
+		}
+	],
+	"processed":20160712,
+	"processor":"R. Trachel",
+	"type":"segments",
+	"version":1
+}
