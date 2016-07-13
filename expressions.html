@@ -110,11 +110,6 @@
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
         }
 
-        String.prototype.replaceAll = function(search, replacement) {
-            var target = this;
-            return target.replace(new RegExp(search, 'g'), replacement);
-        };
-
         vid.addEventListener('canplay', enablestart, false);
         var today = new Date();
         var day = parseInt(today.toISOString().replaceAll('-','').split('T')[0])
@@ -148,18 +143,6 @@
                 processed: day,
                 version: 1
             });
-        }
-
-        Number.prototype.pad = function(size) {
-          var s = String(this);
-          while (s.length < (size || 2)) {s = "0" + s;}
-          return s;
-        }
-
-        String.prototype.pad = function(size) {
-            var s = this;
-            while (s.length < (size || 2)) {s = "0" + s;}
-            return s;
         }
 
         function startVideo() {

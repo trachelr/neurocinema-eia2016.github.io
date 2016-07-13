@@ -42,3 +42,20 @@ function supports_ogg_theora_video() {
   var v = document.createElement("video");
   return v.canPlayType('video/ogg; codecs="theora, vorbis"');
 }
+
+Number.prototype.pad = function(size) {
+  var s = String(this);
+  while (s.length < (size || 2)) {s = "0" + s;}
+  return s;
+}
+
+String.prototype.pad = function(size) {
+    var s = this;
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+}
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
