@@ -39,9 +39,10 @@
                                     },
                                 plugins : {
                                     dataServices : [
-                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/happy.json',
-                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/sad.json',
-                                        'https://neurocinema-a859d.firebaseio.com/20160712T102215536Z/surprised.json'
+                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160712T202830719Z/angry.json',
+                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160712T202830719Z/happy.json',
+                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160712T202830719Z/sad.json',
+                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160712T202830719Z/surprised.json'
                                     ],
                                     list : [
                                         {
@@ -50,10 +51,16 @@
                                             'parameters' : {
                                                 listOfLines : [
                                                     {
+                                                        title : 'Angry face',
+                                                        type : 'segment',
+                                                        metadataId : 'angy',
+                                                        color : '#F00'
+                                                    },
+                                                    {
                                                         title : 'Happy face',
                                                         type : 'segment',
                                                         metadataId : 'happy',
-                                                        color : '#F00'
+                                                        color : '#FF0'
                                                     },
                                                     {
                                                         title : 'Sad face',

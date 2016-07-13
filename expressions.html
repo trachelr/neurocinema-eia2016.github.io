@@ -28,7 +28,6 @@
     <script src="./js/models/d3.min.js"></script>
     <script src="./js/models/emotion_classifier.js"></script>
     <script src="./js/models/emotionmodel.js"></script>
-    <script src="js/webgazer.js" type="text/javascript"></script>
 
     <div id="container">
         <video id="videoel" width="400" height="300" preload="auto" loop></video>
@@ -118,18 +117,21 @@
 
         vid.addEventListener('canplay', enablestart, false);
         var today = new Date();
-        var screen_id = today.toISOString().replaceAll(':','')
-        screen_id = screen_id.replaceAll('-','').replace('.','')
+        var day = parseInt(today.toISOString().replaceAll('-','').split('T')[0])
+        var data = 'emotion'
+        var path = data + '/' + today.toISOString().replaceAll(':','')
+        path = path.replaceAll('-','').replace('.','')
+        console.log(path)
         /*********** setup of emotion detection *************/
-        var last = "";
-        var timestamp = "";
+        var last = ""; //["", "", "", ""];
+        var timestamp = ""; //["", "", "", ""];
         var enames = ["angry", "sad", "surprised", "happy"]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
         
         for (var i = 0;i < enames.length; i++) {
             // init firebase
-            firebase.database().ref(screen_id + '/' + enames[i]).set({
+            firebase.database().ref(path + '/' + enames[i]).set({
                 localisation: [{
                     sublocalisations: {
                         localisation: [],
@@ -143,7 +145,7 @@
                 type: "segments",
                 algorithm: "clmtrackr",
                 processor: "R. Trachel",
-                processed: parseInt(screen_id.split('T')[0]),
+                processed: day,
                 version: 1
             });
         }
@@ -197,11 +199,11 @@
                 if (last == videoID) {
                     // remember only the first time stamp
                 } else {
-                    var ref = firebase.database().ref(screen_id + '/' + videoID + '/localisation/0/sublocalisations/localisation');
+                    console.log('writing timestamp' + timestamp)
+                    var ref = firebase.database().ref(path + '/' + videoID + '/localisation/0/sublocalisations/localisation');
                     // sync down from server
                     var list = [];
                     ref.on('value', function(snap) { list = snap.val(); });
-
                     // this is the correct way to change an array
                     list.push({
                         tcin: timestamp,
@@ -214,7 +216,6 @@
                 }
             }
         }
-        
         function appendUserData(videoID, timestamp, er) {
             var ref = firebase.database().ref('users/' + videoID);
              // sync down from server
@@ -249,7 +250,6 @@
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
                         //appendUserData('test_vid_'+ts, ts, er)
-                        console.log(ts)
                         //var minnow = String(String(ts).split('.')[0]);
                         //var secnow = String(String(String(ts).split('.')[1]).substr(0,1));
                         //var msnow = String(String(ts / 100).split('.')[1]);
@@ -356,74 +356,6 @@
             stats.update();
         }, false);
         
-        </script>
-
-        <script>
-            window.onload = function() {
-                webgazer.setRegression('ridge') /* currently must set regression and tracker */
-                    .setTracker('clmtrackr')
-                    .setGazeListener(function(data, clock) {
-                     //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-                     //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
-                    })
-                    .begin()
-                    .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
-
-                var width = 320;
-                var height = 240;
-                var topDist = '0px';
-                var leftDist = '0px';
-                
-                var setup = function() {
-                    var video = document.getElementById('webgazerVideoFeed');
-                    video.style.display = 'block';
-                    video.style.position = 'absolute';
-                    video.style.top = topDist;
-                    video.style.left = leftDist;
-                    video.width = width;
-                    video.height = height;
-                    video.style.margin = '0px';
-
-                    webgazer.params.imgWidth = width;
-                    webgazer.params.imgHeight = height;
-
-                    var overlay = document.createElement('canvas');
-                    overlay.id = 'overlay';
-                    overlay.style.position = 'absolute';
-                    overlay.width = width;
-                    overlay.height = height;
-                    overlay.style.top = topDist;
-                    overlay.style.left = leftDist;
-                    overlay.style.margin = '0px';
-
-                    document.body.appendChild(overlay);
-
-                    var cl = webgazer.getTracker().clm;
-
-                    function drawLoop() {
-                        requestAnimFrame(drawLoop);
-                        overlay.getContext('2d').clearRect(0,0,width,height);
-                        if (cl.getCurrentPosition()) {
-                            cl.draw(overlay);
-                        }
-                    }
-                    drawLoop();
-                };
-
-                function checkIfReady() {
-                    if (webgazer.isReady()) {
-                        setup();
-                    } else {
-                        setTimeout(checkIfReady, 100);
-                    }
-                }
-                setTimeout(checkIfReady,100);
-            };
-
-            window.onbeforeunload = function() {
-                //webgazer.end(); //Uncomment if you want to save the data even if you reload the page.
-                window.localStorage.clear(); //Comment out if you want to save data across different sessions 
-            }
         </script>
     </body>
 </html>

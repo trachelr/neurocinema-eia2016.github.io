@@ -14,7 +14,6 @@
                 window.location.protocol = "https";
             }
         </script>
-
     </head>
     <body>
         <script src="./js/video.js/video.min.js"></script>
@@ -159,6 +158,10 @@
             }
         </script>
         <script>
+            String.prototype.replaceAll = function(search, replacement) {
+                var target = this;
+                return target.replace(new RegExp(search, 'g'), replacement);
+            };
             String.prototype.pad = function(size) {
                 var s = this;
                 while (s.length < (size || 2)) {s = "0" + s;}
@@ -166,9 +169,13 @@
             }
             var xdata = [];
             var ydata = [];
-            var screen_id = 'webgaze'
+            var data = 'gaze'
+            var today = new Date();
+            var path = data + '/' + today.toISOString().replaceAll(':','')
+            path = path.replaceAll('-','').replace('.','')
+            
             // init firebase
-            firebase.database().ref(screen_id + '/gazetest').set({
+            firebase.database().ref(path).set({
                 localisation: [{
                     sublocalisations: {
                         localisation: [],
@@ -182,12 +189,12 @@
                 type: "visual_tracking",
                 algorithm: "ridge",
                 processor: "R. Trachel",
-                processed: 0, //parseInt(screen_id.split('T')[0]),
+                processed: 0, //parseInt(path.split('T')[0]),
                 version: 1
             });
 
-            function writeUserGaze(videoID, x, y, timestamp) {
-                var ref = firebase.database().ref(screen_id + '/' + videoID + '/localisation/0/sublocalisations/localisation');
+            function writeUserGaze(x, y, timestamp) {
+                var ref = firebase.database().ref(path + '/localisation/0/sublocalisations/localisation');
                 // sync down from server
                 var list = [];
                 ref.on('value', function(snap) { list = snap.val(); });
@@ -196,7 +203,7 @@
                 // this is the correct way to change an array
                 list.push({
                     shape: {
-                        t: "rectangle",
+                        t: "ellipse",
                         c: {
                             x: x,
                             y: y
@@ -227,7 +234,7 @@
                         var ms = String(String(ts).split('.')[1]).substr(0,4)
                         timestamp = "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms)
                         if (ts > 0) {
-                            writeUserGaze('gazetest', math.mean(xdata), math.mean(ydata), timestamp);
+                            writeUserGaze(math.mean(xdata), math.mean(ydata), timestamp);
                         }
                         xdata = [];
                         ydata = [];
