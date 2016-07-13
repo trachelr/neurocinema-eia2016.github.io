@@ -109,13 +109,16 @@
         var data = 'emotion'
         var path = data + '/' + today.toISOString().replaceAll(':','')
         path = path.replaceAll('-','').replace('.','')
-        console.log(path)
         /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
         var timestamp = ""; //["", "", "", ""];
         var enames = ["angry", "sad", "surprised", "happy"]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
+
+        function showVideo() {
+            vid.
+        }
 
         function startVideo() {
             // start video
