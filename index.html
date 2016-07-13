@@ -70,7 +70,7 @@
     </nav>
     <iframe src="home.html" name="content" seamless>
         <!-- Page Content -->
-        <div class="container">
+        <div class="text-container">
             <div class="row">
                 <div class="col-lg-12">
                     <h1>Access to your webcam</h1>
@@ -78,9 +78,45 @@
                 </div>
             </div>
         </div>
+        <div id="container">
+            <video id="videoel" width="400" height="300" preload="auto" loop></video>
+            <canvas id="overlay" width="400" height="300"></canvas>
+        </div>
     </iframe>
     <!-- /.container -->
+    <script> 
+        var vid = document.getElementById('videoel');
+        
+        /********** check and set up video/webcam **********/
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
 
+        // check for camerasupport
+        if (navigator.getUserMedia) {
+            // set up stream
+            var videoSelector = {video : true};
+            if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
+                var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+                if (chromeVersion < 20) {
+                    videoSelector = "video";
+                }
+            };
+
+            navigator.getUserMedia(videoSelector, function( stream ) {
+                if (vid.mozCaptureStream) {
+                    vid.mozSrcObject = stream;
+                } else {
+                    vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+                }
+            }, function() {
+                //insertAltVideo(vid);
+                alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
+            });
+        } else {
+            //insertAltVideo(vid);
+            alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
+        }
+    </script>
 </body>
 
 </html>

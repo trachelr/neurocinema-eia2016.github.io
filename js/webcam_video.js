@@ -1,7 +1,3 @@
-var vid = document.getElementById('videoel');
-var overlay = document.getElementById('overlay');
-var overlayCC = overlay.getContext('2d');
-
 /********** check and set up video/webcam **********/
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;

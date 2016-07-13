@@ -17,9 +17,6 @@
 
     </head>
     <body>
-    <script src="./js/video.js/video.min.js"></script>
-    <script src="./js/video-js/video.js"></script>
-    <script src="./js/Youtube.min.js"></script>
     <script src="./js/utils.js"></script>
     <script src="./js/clmtrackr/clm.js"></script>
     <script src="./js/clmtrackr/clmtrackr.js"></script>
@@ -48,52 +45,36 @@
     </div>
 
     <script src="js/index.js"></script>
-    <script src="js/webcam_video.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
     <script>
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
-
-        // check for camerasupport
-        if (navigator.getUserMedia) {
-            // set up stream
-            var videoSelector = {video : true};
-            if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
-                var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
-                if (chromeVersion < 20) {
-                    videoSelector = "video";
-                }
-            };
-
-            navigator.getUserMedia(videoSelector, function( stream ) {
-                if (vid.mozCaptureStream) {
-                    vid.mozSrcObject = stream;
-                } else {
-                    vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
-                }
-                vid.play();
-            }, function() {
-                //insertAltVideo(vid);
-                alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
-            });
-        } else {
-            //insertAltVideo(vid);
-            alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
-        }
-    </script>
-    <script>
+        var vid = document.getElementById('videoel');
+        var overlay = document.getElementById('overlay');
         var overlayCC = overlay.getContext('2d');
-        
+
         /*********** setup of emotion detection *************/
         var enames = ["angry", "sad", "surprised", "happy"]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
-        // start video
-        vid.play();
-        // start tracking
-        ctrack.start(vid);
-        // start loop to draw face
-        drawLoop();
+        
+        function startVideo() {
+            // start video
+            vid.play();
+            // start tracking
+            ctrack.start(vid);
+            // start loop to draw face
+            drawLoop();
+            startPlayer();
+        }
+        function startPlayer() {
+            // load video
+            video.load();
+            // start playing
+            video.play();
+        }
+
+        var ec = new emotionClassifier();
+        ec.init(emotionModel);
+        var emotionData = ec.getBlank();  
 
         function drawLoop() {
             requestAnimFrame(drawLoop);
@@ -103,7 +84,7 @@
                 ctrack.draw(overlay);
             }
             var cp = ctrack.getCurrentParameters();
-            var er = window.parent.ec.meanPredict(cp);
+            var er = ec.meanPredict(cp);
             if (er) {
                 updateData(er);
                 for (var i = 0;i < er.length;i++) {
@@ -114,11 +95,7 @@
                     }
                 }
             }
-        }
-        
-        var ec = new emotionClassifier();
-        ec.init(emotionModel);
-        var emotionData = ec.getBlank();    
+        }  
         
         /************ d3 code for barchart *****************/
         var margin = {top : 20, right : 20, bottom : 10, left : 40},
