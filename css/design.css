@@ -1,0 +1,148 @@
+/* CONTENTS
+   1. Layout
+   2. Colors
+   3. Typography
+   4. Boxes, buttons, etc.
+   5. Forms
+   6. Bottom part, Footer
+   7. Mobile styles
+*/
+
+/*******************************************
+ *
+ *  1. Layout
+ *
+ *******************************************/
+body{ background-repeat:no-repeat; background-position: top center; background-attachment: fixed;}
+.container{ max-width: 1200px; } /* Can be wider */
+
+.padding{padding:20px 0 20px 0;}
+
+#Head{padding:50px 1.50306% 50px 1.50306%; }
+#Head img{width:200px; align: center;}
+
+#Stats{ padding:0 1.50306% 0 1.50306%;}
+	#Stats .col{ margin-left:0; padding:25px 0 25px 0; }
+	#Stats .col:last-child{ background:none; }
+	#Stats .span_3{ width:12.5%; }
+	#Stats .span_4{ width:16.666666666%; }
+	#Stats .span_6{ width:25%; }
+	#Stats .span_8{ width:33.333333333%; }
+	#Stats .span_12{ width:50%; }
+	#Stats.stats-ad{ padding:23px 1.50306% 7px 1.50306%; opacity:1;}
+	#Stats .value{ display:block; width:100%; text-align:center; margin:0 0 20px 0;}
+	#Stats .info{ display:block; width:100%; text-align:center; }
+
+	.numberCircle {
+		margin: auto;
+    	width: 50%;
+	    border-radius: 50%;
+	    height: 100%;
+	    width:20px;
+	 	text-align: center;
+	    border: 1px solid #FF5B00;
+	    color:#FF5B00;
+	}
+
+#Content{position: relative;  padding:0 1.50306% 0 1.50306%; margin-top:25px; margin-bottom:25px; z-index: 999;}
+
+#Button{padding:0 1.50306% 0 1.50306%; margin-top:25px; margin-bottom:25px; z-index: 999;}
+
+#Footer{ padding:0 1.50306%; margin-bottom: 40px;}
+
+.margin{ margin-bottom:20px; }
+
+iframe {
+    display: block;       /* iframes are inline by default */
+    background: transparent !important;
+    border: none;         /* Reset default border */
+    height: 100vh;        /* Viewport-relative units */
+    width: 100vw;
+}
+
+/*******************************************
+ *
+ *  2. Colors
+ *
+ *******************************************/
+
+body{ background-color: #1b1b1b; background-image: url(../images/neuro.jpg); color: #444; background-size: cover;}
+
+#Stats{color:#595959;}
+
+h1, h2, h3, h4, h5, h6, p { color:#ffffff;}
+a{ color: #ffffff; }
+
+
+/*******************************************
+ *
+ *  3. Typography
+ *
+ *******************************************/
+
+body{ font-family: "Open Sans", Helvetica, Arial, sans-serif; line-height: 1.5em; font-size: 13px; }
+h1, h2, h3, h4, h5, h6 { font-family: "Open Sans", Helvetica, Arial, sans-serif; padding-bottom: 3px; line-height: 1.2em; font-weight: 300; margin-bottom:15px;  }
+h1 { font-size: 29px; }
+h2 { font-size: 27px; }
+h3 { font-size: 16px; font-weight:400; }
+h4 { font-size: 15px; }
+h5 { font-size: 14px; }
+h6 { font-size: 12px; }
+
+p{ margin: 0 0 18px 0; }
+ul{ margin: 0 0 18px 0; }
+
+a{ text-decoration: none; }
+
+strong, b{ font-weight:bold; }
+
+#Stats .value{ font-size:18px; font-weight: 100;}
+
+.align-center{ text-align: center; }
+.align-left{ text-align: left; }
+.align-right{ text-align: right; }
+.align-justify{ text-align: justify; }
+
+
+
+/*******************************************
+ *
+ *  4. Boxes, Buttons, etc.
+ *
+ *******************************************/
+
+.icon{ position: relative; top: 9px; font-size: 32px; margin: 0 4px 0 0;} 
+.btn { font-size:22px;}
+	.btn:hover{ color: #FF5B00;}
+
+
+/*******************************************
+ *
+ *  6. Bottom part, Footer
+ *
+ *******************************************/
+
+#Footer{ font-size:11px; font-weight: bold; color: #FFFFFF;}
+#Footer a{ text-decoration: none; }
+	#Footer a:hover{ text-decoration: underline; }
+
+
+
+/*******************************************
+ *
+ *  7. Mobile Styles
+ *
+ *******************************************/
+@media only screen and (max-width: 767px) {
+	#Head{ padding-top:20px; padding-bottom:15px; }
+		#Head h1{ margin:0 0 10px 0; font-size:26px; }
+	#Domain{ float: none; display:block; width:100%; text-align: center; margin-bottom:0; }
+	#Domain span{ line-height:1.2em; margin-top: 0; width:100%; text-align: center; }
+	#Action{ margin-top:0px; }
+
+	#Stats .col{ width:50%!important; background:none!important; }
+	#Stats .col:nth-child(odd){ clear:both!important; }
+
+	#Add-domains li{ width: 100%; margin:0 0 6px 0; }
+	#Footer .col{ text-align: center; }
+}
