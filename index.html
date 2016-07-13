@@ -79,14 +79,8 @@
             </div>
         </div>
     </iframe>
-    <div id="container">
-        <video id="videoel" width="400" height="300" preload="auto" loop></video>
-        <canvas id="overlay" width="400" height="300"></canvas>
-    </div>
     <!-- /.container -->
-    <script> 
-        var vid = document.getElementById('videoel');
-        
+    <script>
         /********** check and set up video/webcam **********/
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
@@ -101,17 +95,6 @@
                     videoSelector = "video";
                 }
             };
-
-            navigator.getUserMedia(videoSelector, function( stream ) {
-                if (vid.mozCaptureStream) {
-                    vid.mozSrcObject = stream;
-                } else {
-                    vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
-                }
-            }, function() {
-                //insertAltVideo(vid);
-                alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
-            });
         } else {
             //insertAltVideo(vid);
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");

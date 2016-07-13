@@ -51,6 +51,24 @@
         var overlay = document.getElementById('overlay');
         var overlayCC = overlay.getContext('2d');
 
+        navigator.getUserMedia(videoSelector, function( stream ) {
+            if (vid.mozCaptureStream) {
+                vid.mozSrcObject = stream;
+            } else {
+                vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+            }
+            vid.play()
+        }, function() {
+            //insertAltVideo(vid);
+            alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
+        });
+
+        function enablestart() {
+            var startbutton = document.getElementById('startbutton');
+            startbutton.value = "start";
+            startbutton.disabled = null;
+        }
+
         /*********** setup of emotion detection *************/
         vid.addEventListener('canplay', enablestart, false);
         
@@ -67,14 +85,6 @@
             ctrack.start(vid);
             // start loop to draw face
             drawLoop();
-            startPlayer();
-        }
-
-        function startPlayer() {
-            // load video
-            video.load();
-            // start playing
-            video.play();
         }
 
         function drawLoop() {
@@ -86,7 +96,6 @@
             }
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
-            var ts = videojs('youtube_player').currentTime();
 
             if (er) {
                 updateData(er);
@@ -103,9 +112,8 @@
         var ec = new emotionClassifier();
         ec.init(emotionModel);
         var emotionData = ec.getBlank();    
-        
-        /************ d3 code for barchart *****************/
 
+        /************ d3 code for barchart *****************/
         var margin = {top : 20, right : 20, bottom : 10, left : 40},
             width = 400 - margin.left - margin.right,
             height = 100 - margin.top - margin.bottom;
@@ -170,7 +178,7 @@
                 .attr("y", function(datum) { return height - y(datum.value); })
                 .text(function(datum) { return datum.value.toFixed(1);});
 
-            // enter 
+            // enter
             rects.enter().append("svg:rect");
             texts.enter().append("svg:text");
 
