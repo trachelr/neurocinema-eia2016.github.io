@@ -10,6 +10,15 @@
 
     <title>NeuroCinema</title>
 
+    <script>
+        // getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
+        if (window.location.protocol == "file:") {
+            alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
+        } else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
+            window.location.protocol = "https";
+        }
+    </script>
+
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
@@ -48,16 +57,16 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="expressions.html" target="content">Expressions</a>
+                        <a href="#expressions" target="content">Expressions</a>
                     </li>
                     <li>
-                        <a href="webgaze.html" target="content">Eye-tracking</a>
+                        <a href="#webgaze" target="content">Eye-tracking</a>
                     </li>
                     <li>
-                        <a href="viewer.html" target="content">Watch it!</a>
+                        <a href="#viewer" target="content">Watch it!</a>
                     </li>
                     <li>
-                        <a href="timeline.html" target="content">Results</a>
+                        <a href="#timeline" target="content">Results</a>
                     </li>
                     <li>
                         <a href="#">Dashboard</a>
@@ -68,18 +77,51 @@
         </div>
         <!-- /.container -->
     </nav>
-    <iframe src="home.html" name="content" seamless>
-        <!-- Page Content -->
-        <div class="text-container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1>Access to your webcam</h1>
-                    <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
-                </div>
+
+    <!-- Page Content -->
+    <div class="text-container" id="expressions">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Facial Expression</h1>
+                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
             </div>
         </div>
-    </iframe>
+    </div>
+    <div id="container">
+        <video id="videoel" width="400" height="300" preload="auto" loop></video>
+        <canvas id="overlay" width="400" height="300"></canvas>
+    </div>
+
+    <div id="emotion_container">
+        <div id="emotion_icons">
+            <img class="emotion_icon" id="icon1" src="./media/icons/angry.png">
+            <img class="emotion_icon" id="icon2" src="./media/icons/sad.png">
+            <img class="emotion_icon" id="icon3" src="./media/icons/surprised.png">
+            <img class="emotion_icon" id="icon4" src="./media/icons/happy.png">
+        </div>
+        <div id='emotion_chart'></div>
+    </div>
+        <div id="controls">
+        <input class="btn" type="button" value="wait, loading video" disabled="disabled" onclick="startVideo()" id="startbutton"></input>
+        <input class="btn" type="button" value="stop" disabled="enabled" onclick="startPlayer()" id="startplayer"></input>
+    </div>
+
+    <!-- Page Content -->
+    <div class="text-container" id="webgaze">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Eye-tracking</h1>
+                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
+            </div>
+        </div>
+    </div>
     <!-- /.container -->
+    <div id="container">
+        <video id="videoel" width="400" height="300" preload="auto" loop></video>
+        <canvas id="overlay" width="400" height="300"></canvas>
+    </div>
+
+
 </body>
 
 </html>
