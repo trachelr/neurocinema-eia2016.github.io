@@ -52,10 +52,14 @@
         var overlayCC = overlay.getContext('2d');
 
         /*********** setup of emotion detection *************/
+        vid.addEventListener('canplay', enablestart, false);
+        
+        var last = ""; //["", "", "", ""];
+        var timestamp = ""; //["", "", "", ""];
         var enames = ["angry", "sad", "surprised", "happy"]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
-        
+
         function startVideo() {
             // start video
             vid.play();
@@ -65,16 +69,13 @@
             drawLoop();
             startPlayer();
         }
+
         function startPlayer() {
             // load video
             video.load();
             // start playing
             video.play();
         }
-
-        var ec = new emotionClassifier();
-        ec.init(emotionModel);
-        var emotionData = ec.getBlank();  
 
         function drawLoop() {
             requestAnimFrame(drawLoop);
@@ -85,6 +86,8 @@
             }
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
+            var ts = videojs('youtube_player').currentTime();
+
             if (er) {
                 updateData(er);
                 for (var i = 0;i < er.length;i++) {
@@ -95,9 +98,14 @@
                     }
                 }
             }
-        }  
+        }
+        
+        var ec = new emotionClassifier();
+        ec.init(emotionModel);
+        var emotionData = ec.getBlank();    
         
         /************ d3 code for barchart *****************/
+
         var margin = {top : 20, right : 20, bottom : 10, left : 40},
             width = 400 - margin.left - margin.right,
             height = 100 - margin.top - margin.bottom;
