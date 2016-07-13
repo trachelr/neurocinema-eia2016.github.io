@@ -47,10 +47,6 @@
         <input class="btn" type="button" value="stop" disabled="enabled" onclick="startPlayer()" id="startplayer"></input>
     </div>
     
-    <video id="youtube_player" data-setup="{}" controls="">
-        <source src="media/Beetlejuice french scene - YouTube_360p.mp4" type="video/mp4">
-    </video>
-
     <script src="js/index.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
     <script>
@@ -64,13 +60,10 @@
       firebase.initializeApp(config);
     </script>
     <script>
-        var video_player = document.getElementById('youtube_player');
-        var video = document.querySelector("#youtube_player video");
         var vid = document.getElementById('videoel');
         var overlay = document.getElementById('overlay');
         var overlayCC = overlay.getContext('2d');
-        var sources = video_player.getElementsByTagName('a');
-
+        
         /********** check and set up video/webcam **********/
 
         function enablestart() {
@@ -123,27 +116,6 @@
         var enames = ["angry", "sad", "surprised", "happy"]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
-        
-        for (var i = 0;i < enames.length; i++) {
-            // init firebase
-            firebase.database().ref(path + '/' + enames[i]).set({
-                localisation: [{
-                    sublocalisations: {
-                        localisation: [],
-                    },
-                    type: "segments",
-                    tcin: "00:00:00.0000",
-                    tcout: "00:60:00.0000",
-                    tclevel: 0
-                }],
-                id: enames[i],
-                type: "segments",
-                algorithm: "clmtrackr",
-                processor: "R. Trachel",
-                processed: day,
-                version: 1
-            });
-        }
 
         function startVideo() {
             // start video
@@ -162,61 +134,6 @@
             video.play();
         }
 
-        function setUserData(videoID, timestamp, er) {
-            firebase.database().ref('users/' + videoID).set({
-                timestamp: timestamp,
-                angry: er[0],
-                sad: er[1],
-                surprised: er[2],
-                happy: er[3]
-            });
-        }
-        
-        function writeEmotionSegment(videoID, er, min, sec, ms) {
-            if (last == "") {
-                last = videoID
-            }
-            if (timestamp == "") {
-                timestamp = "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms)
-            } else {
-                if (last == videoID) {
-                    // remember only the first time stamp
-                } else {
-                    console.log('writing timestamp' + timestamp)
-                    var ref = firebase.database().ref(path + '/' + videoID + '/localisation/0/sublocalisations/localisation');
-                    // sync down from server
-                    var list = [];
-                    ref.on('value', function(snap) { list = snap.val(); });
-                    // this is the correct way to change an array
-                    list.push({
-                        tcin: timestamp,
-                        tcout: "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms),
-                        tclevel: 1
-                    });
-                    ref.set(list);
-                    timestamp = "";
-                    last = "";
-                }
-            }
-        }
-        function appendUserData(videoID, timestamp, er) {
-            var ref = firebase.database().ref('users/' + videoID);
-             // sync down from server
-             var list = [];
-             ref.on('value', function(snap) { list = snap.val(); });
-
-             // time to remove 'bar'!
-             // this is the correct way to change an array
-             list.push({
-                timestamp: timestamp,
-                angry: er[0],
-                sad: er[1],
-                surprised: er[2],
-                happy: er[3]
-             });
-             ref.set(list);
-        }
-
         function drawLoop() {
             requestAnimFrame(drawLoop);
             overlayCC.clearRect(0, 0, 400, 300);
@@ -226,20 +143,10 @@
             }
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
-            var ts = videojs('youtube_player').currentTime();
-
             if (er) {
                 updateData(er);
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
-                        //appendUserData('test_vid_'+ts, ts, er)
-                        //var minnow = String(String(ts).split('.')[0]);
-                        //var secnow = String(String(String(ts).split('.')[1]).substr(0,1));
-                        //var msnow = String(String(ts / 100).split('.')[1]);
-                        var minnow = String(ts / 60).split('.')[0].pad(2);
-                        var secnow = String(ts).split('.')[0].pad(2);
-                        var msnow = String(String(ts).split('.')[1]).substr(0,4)
-                        writeEmotionSegment(enames[i], er[i], minnow, secnow, msnow);
                         document.getElementById('icon'+(i+1)).style.visibility = 'visible';
                     } else {
                         document.getElementById('icon'+(i+1)).style.visibility = 'hidden';
