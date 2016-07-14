@@ -252,7 +252,10 @@
             requestAnimFrame(drawLoop);
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
-            var ts = player.getCurrentTime();
+            var ts = 0;
+            if (player != null) {
+                ts = player.getCurrentTime();
+            }
             if (er) {
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
