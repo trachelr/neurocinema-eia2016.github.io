@@ -60,17 +60,7 @@
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
 
     <div id="player"></div>
-    <div id="emotion_container">
-        <div id="emotion_icons">
-            <img class="emotion_icon" id="icon1" src="media/icons/angry.png">
-            <img class="emotion_icon" id="icon2" src="media/icons/sad.png">
-            <img class="emotion_icon" id="icon3" src="media/icons/surprised.png">
-            <img class="emotion_icon" id="icon4" src="media/icons/happy.png">
-        </div>
-        <div id='emotion_chart'></div>
-    </div>
-    <video id="videoel" width="400" height="300" preload="auto" loop></video>
-    
+
     <script>    
         // Initialize Amalia.js Player
         var player = null;
@@ -144,6 +134,9 @@
                     vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
                 }
                 vid.play();
+                ctrack.start(vid);
+                // start loop to draw face
+                detectEmotionLoop();
             }, function() {
                 //insertAltVideo(vid);
                 alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
@@ -186,6 +179,10 @@
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
 
+        var ec = new emotionClassifier();
+        ec.init(emotionModel);
+        var emotionData = ec.getBlank();    
+        
         for (var i = 0;i < enames.length; i++) {
             // init firebase
             firebase.database().ref(path + '/' + enames[i]).set({
@@ -260,14 +257,6 @@
                 }
             }
         }
-        
-        var ec = new emotionClassifier();
-        ec.init(emotionModel);
-        var emotionData = ec.getBlank();    
-        
-        ctrack.start(vid);
-        // start loop to draw face
-        detectEmotionLoop();
         
         </script>
     </body>
