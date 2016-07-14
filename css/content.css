@@ -1,6 +1,5 @@
 body {
     margin: 0;            /* Reset default margin */
-    overflow: hidden;
 }
 
 iframe {
@@ -9,7 +8,6 @@ iframe {
     border: none;         /* Reset default border */
     height: 100vh;        /* Viewport-relative units */
     width: 100vw;
-    scrolling:"no";
 }
 
 iframe[seamless]{
@@ -18,3 +16,6 @@ iframe[seamless]{
     padding: 0px;
     overflow: hidden;
 }
+
+.video-js {padding-top: 56.25%}
+.vjs-fullscreen {padding-top: 0px}

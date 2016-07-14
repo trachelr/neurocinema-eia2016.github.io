@@ -5,7 +5,9 @@
         <title>An emotion-based video player</title>
         <link rel="stylesheet" href="css/style.css">
         <link rel="stylesheet" href="css/emoticon.css">
+        <link rel="stylesheet" href="css/content.css">
         <link type="text/css" rel="stylesheet" href="css/video-js.min.css" />
+        <link href="//vjs.zencdn.net/5.8/video-js.min.css" rel="stylesheet">
         <script>
             // getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
             if (window.location.protocol == "file:") {
@@ -17,8 +19,10 @@
 
     </head>
     <body>
+    <script src="//vjs.zencdn.net/5.8/video.min.js"></script>
     <script src="js/video.js/video.min.js"></script>
     <script src="js/video-js/video.js"></script>
+
     <script src="js/Youtube.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/clmtrackr/clm.js"></script>
@@ -33,52 +37,63 @@
         <video id="videoel" width="400" height="300" preload="auto" loop></video>
         <canvas id="overlay" width="400" height="300"></canvas>
     </div>
+
     <div id="emotion_container">
         <div id="emotion_icons">
-            <img class="emotion_icon" id="icon1" src="./media/icons/angry.png">
-            <img class="emotion_icon" id="icon2" src="./media/icons/sad.png">
-            <img class="emotion_icon" id="icon3" src="./media/icons/surprised.png">
-            <img class="emotion_icon" id="icon4" src="./media/icons/happy.png">
+            <img class="emotion_icon" id="icon1" src="media/icons/angry.png">
+            <img class="emotion_icon" id="icon2" src="media/icons/sad.png">
+            <img class="emotion_icon" id="icon3" src="media/icons/surprised.png">
+            <img class="emotion_icon" id="icon4" src="media/icons/happy.png">
         </div>
         <div id='emotion_chart'></div>
     </div>
         <div id="controls">
         <input class="btn" type="button" value="wait, loading video" disabled="disabled" onclick="startVideo()" id="startbutton"></input>
-        <input class="btn" type="button" value="stop" disabled="enabled" onclick="startPlayer()" id="startplayer"></input>
+        <input class="btn" type="button" value="watch it!" disabled="enabled" onclick="showPlayer()" id="showplayer"></input>
     </div>
-    
+
+    <video id="youtube_player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" data-setup='{}'>
+      <source src="media/Beetlejuice french scene - YouTube_360p.mp4" type="video/mp4">
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a web browser
+        that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+      </p>
+    </video>
+
     <script src="js/index.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
     <script>
-      // Initialize Firebase
-      var config = {
-        apiKey: "AIzaSyBI1lAq_sWUkSyuw6_q9Tp4Xq57pTqQLUU",
-        authDomain: "neurocinema-a859d.firebaseapp.com",
-        databaseURL: "https://neurocinema-a859d.firebaseio.com",
-        storageBucket: "neurocinema-a859d.appspot.com",
-      };
-      firebase.initializeApp(config);
-    </script>
-    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBI1lAq_sWUkSyuw6_q9Tp4Xq57pTqQLUU",
+            authDomain: "neurocinema-a859d.firebaseapp.com",
+            databaseURL: "https://neurocinema-a859d.firebaseio.com",
+            storageBucket: "neurocinema-a859d.appspot.com",
+        };
+        firebase.initializeApp(config);
+
         var vid = document.getElementById('videoel');
+        var video_player = document.getElementById('youtube_player');
+        var video = document.querySelector("#youtube_player video");
         var overlay = document.getElementById('overlay');
         var overlayCC = overlay.getContext('2d');
-        
-        /********** check and set up video/webcam **********/
+        // document.getElementById('youtube_player').style.visibility = 'hidden';
 
+        /********** check and set up video/webcam **********/
         function enablestart() {
             var startbutton = document.getElementById('startbutton');
             startbutton.value = "start";
             startbutton.disabled = null;
+            var showbutton = document.getElementById('showplayer');
+            showbutton.disabled = null;
         }
-        
+
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
 
         // check for camerasupport
         if (navigator.getUserMedia) {
             // set up stream
-            
             var videoSelector = {video : true};
             if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
                 var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
@@ -116,6 +131,58 @@
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
 
+        for (var i = 0;i < enames.length; i++) {
+            // init firebase
+            firebase.database().ref(path + '/' + enames[i]).set({
+                localisation: [{
+                    sublocalisations: {
+                        localisation: [],
+                    },
+                    type: "segments",
+                    tcin: "00:00:00.0000",
+                    tcout: "00:60:00.0000",
+                    tclevel: 0
+                }],
+                id: enames[i],
+                type: "segments",
+                algorithm: "clmtrackr",
+                processor: "R. Trachel",
+                processed: day,
+                version: 1
+            });
+        }
+
+        function writeEmotionSegment(videoID, min, sec, ms) {
+            if (last == "") {
+                last = videoID
+            }
+            if (timestamp == "") {
+                console.log('getting: ' + timestamp)
+                timestamp = "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms)
+            } else {
+                if (last == videoID) {
+                    // remember only the first time stamp
+                    console.log('not saving timestamp...')
+                } else {
+                    console.log('writing timestamp' + timestamp)
+                    var ref = firebase.database().ref(path + '/' + videoID + '/localisation/0/sublocalisations/localisation');
+                    // sync down from server
+                    var list = [];
+                    ref.on('value', function(snap) { list = snap.val(); });
+                    // this is the correct way to change an array
+                    list.push({
+                        tcin: timestamp,
+                        tcout: "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms),
+                        tclevel: 1
+                    });
+                    ref.set(list);
+                    console.log('writting: ' + timestamp)
+                    timestamp = "";
+                    last = "";
+                }
+            }
+        }
+
         function startVideo() {
             // start video
             vid.play();
@@ -123,14 +190,16 @@
             ctrack.start(vid);
             // start loop to draw face
             drawLoop();
-            startPlayer();
         }
 
-        function startPlayer() {
+        function showPlayer() {
+            video_player = videojs('youtube_player');
+            document.getElementById('youtube_player').style.visibility = 'visible';
             // load video
-            video.load();
+            video_player.load();
+            video_player.requestFullscreen();
             // start playing
-            video.play();
+            video_player.play();
         }
 
         function drawLoop() {
@@ -142,10 +211,17 @@
             }
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
+            var player = videojs('youtube_player');
+            var ts = player.currentTime();
             if (er) {
                 updateData(er);
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
+                        // console.log(enames[i] + ': ' + er[i].value)
+                        var minnow = String(ts / 60).split('.')[0].pad(2);
+                        var secnow = String(ts).split('.')[0].pad(2);
+                        var msnow = String(String(ts).split('.')[1]).substr(0,4)
+                        writeEmotionSegment(enames[i], minnow, secnow, msnow);
                         document.getElementById('icon'+(i+1)).style.visibility = 'visible';
                     } else {
                         document.getElementById('icon'+(i+1)).style.visibility = 'hidden';

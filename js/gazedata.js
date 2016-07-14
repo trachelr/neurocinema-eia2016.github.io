@@ -1,8 +1,26 @@
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyBI1lAq_sWUkSyuw6_q9Tp4Xq57pTqQLUU",
+    authDomain: "neurocinema-a859d.firebaseapp.com",
+    databaseURL: "https://neurocinema-a859d.firebaseio.com",
+    storageBucket: "neurocinema-a859d.appspot.com",
+};
+firebase.initializeApp(config);
+
+var vid = document.getElementById('videoel');
+var video_player = document.getElementById('youtube_player');
+var video = document.querySelector("#youtube_player video");
+var overlay = document.getElementById('overlay');
+var overlayCC = overlay.getContext('2d');
+document.getElementById('youtube_player').style.visibility = 'hidden';
+
 var xdata = [];
 var ydata = [];
-var data = 'gaze'
+
 var today = new Date();
-var path = data + '/' + today.toISOString().replaceAll(':','')
+var day = parseInt(today.toISOString().replaceAll('-','').split('T')[0])
+var data = 'gaze'
+var path = today.toISOString().replaceAll(':','') + '/' + data
 path = path.replaceAll('-','').replace('.','')
 
 // init firebase
@@ -23,6 +41,53 @@ firebase.database().ref(path).set({
     processed: 0, //parseInt(path.split('T')[0]),
     version: 1
 });
+/********** check and set up video/webcam **********/
+
+function enablestart() {
+    var startbutton = document.getElementById('startbutton');
+    startbutton.value = "start";
+    startbutton.disabled = null;
+}
+
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
+
+// check for camerasupport
+if (navigator.getUserMedia) {
+    // set up stream
+    var videoSelector = {video : true};
+    if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
+        var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+        if (chromeVersion < 20) {
+            videoSelector = "video";
+        }
+    };
+
+    navigator.getUserMedia(videoSelector, function( stream ) {
+        if (vid.mozCaptureStream) {
+            vid.mozSrcObject = stream;
+        } else {
+            vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+        }
+        vid.play();
+    }, function() {
+        //insertAltVideo(vid);
+        alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
+    });
+} else {
+    //insertAltVideo(vid);
+    alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
+}
+
+function showPlayer() {
+    video_player = videojs('youtube_player');
+    document.getElementById('youtube_player').style.visibility = 'visible';
+    // load video
+    video_player.load();
+    video_player.requestFullscreen();
+    // start playing
+    video_player.play();
+}
 
 function writeUserGaze(x, y, timestamp) {
     var ref = firebase.database().ref(path + '/localisation/0/sublocalisations/localisation');
@@ -57,7 +122,6 @@ window.onload = function() {
         //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
         if(!data)
             return;
-
         if (xdata.length == 10) {
             var ts = videojs('youtube_player').currentTime();
             var min = String(ts / 60).split('.')[0].pad(2);
@@ -73,60 +137,34 @@ window.onload = function() {
             xdata.push(data.x);
             ydata.push(data.y);
         }
-
         })
         .begin()
         .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
 
-    var width = vid.width;//320;
-    var height = vid.height; //240;
-    var topDist = '0px';
-    var leftDist = '0px';
-    
-    var setup = function() {
-        var video = document.getElementById('webgazerVideoFeed');
-        video.style.display = 'block';
-        video.style.position = 'absolute';
-        video.style.top = topDist;
-        video.style.left = leftDist;
-        video.width = width;
-        video.height = height;
-        video.style.margin = '0px';
+        var width = 400;
+        var height = 300;
+        var topDist = '0px';
+        var leftDist = '0px';
+        
+        var setup = function() {
+            webgazer.params.imgWidth = width;
+            webgazer.params.imgHeight = height;
+            var cl = webgazer.getTracker().clm;
 
-        webgazer.params.imgWidth = width;
-        webgazer.params.imgHeight = height;
+            function drawLoop() {
+                requestAnimFrame(drawLoop);
+            }
+            drawLoop();
+        };
 
-        var overlay = document.createElement('canvas');
-        overlay.id = 'overlay';
-        overlay.style.position = 'absolute';
-        overlay.width = width;
-        overlay.height = height;
-        overlay.style.top = topDist;
-        overlay.style.left = leftDist;
-        overlay.style.margin = '0px';
-
-        document.body.appendChild(overlay);
-
-        var cl = webgazer.getTracker().clm;
-
-        function drawLoop() {
-            requestAnimFrame(drawLoop);
-            overlay.getContext('2d').clearRect(0,0,width,height);
-            if (cl.getCurrentPosition()) {
-                cl.draw(overlay);
+        function checkIfReady() {
+            if (webgazer.isReady()) {
+                setup();
+            } else {
+                setTimeout(checkIfReady, 100);
             }
         }
-        drawLoop();
-    };
-
-    function checkIfReady() {
-        if (webgazer.isReady()) {
-            setup();
-        } else {
-            setTimeout(checkIfReady, 100);
-        }
-    }
-    setTimeout(checkIfReady,100);
+        setTimeout(checkIfReady,100);
 };
 
 window.onbeforeunload = function() {
