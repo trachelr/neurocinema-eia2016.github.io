@@ -97,6 +97,7 @@
         function playVideo() {
             if (player !== null) {
                 player.play();
+                console.log('playing...');
             }
         }
 
@@ -108,6 +109,7 @@
             storageBucket: "neurocinema-a859d.appspot.com",
         };
         firebase.initializeApp(config);
+        console.log('firebase ok...');
 
         var vid = document.getElementById('videoel');
         // document.getElementById('youtube_player').style.visibility = 'hidden';
@@ -151,6 +153,9 @@
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
         }
 
+        console.log('webcam ok...');
+        console.log(vid);
+        
         // guess the viewer id from cookies
         var viewer_id = getCookie("viwer_id");
         if (viewer_id == "") {
@@ -165,6 +170,7 @@
             setCookie("nb_view", parseInt(nb_view) + 1, 30);
         }
 
+        console.log('hi! ' + viewer_id);
         var day = parseInt(viewer_id.replaceAll('-','').split('T')[0])
         var data = 'emotions'
         var path = data + '/' + viewer_id.replaceAll(':','')
@@ -176,6 +182,7 @@
                       'sad/' + String(nb_view).pad(3), 
                       'surprised/' + String(nb_view).pad(3), 
                       'happy/' + String(nb_view).pad(3)]
+
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
 
@@ -241,10 +248,10 @@
                 curtime = 0;
             }
             if (er) {
-                console.log(enames[0] + ': ' + er[0].value)
+                //console.log(enames[0] + ': ' + er[0].value + ' at ' + curtime)
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
-                        // console.log(enames[i] + ': ' + er[i].value)
+                        console.log(enames[i] + ': ' + er[i].value)
                         var minnow = String(curtime / 60).split('.')[0].pad(2);
                         var secnow = String(curtime).split('.')[0].pad(2);
                         var msnow = String(String(curtime).split('.')[1]).substr(0,4)
