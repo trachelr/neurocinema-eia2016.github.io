@@ -1,35 +1,109 @@
 <!DOCTYPE html>
 <html >
-    <head>
-        <meta charset="UTF-8">
-        <title>An emotion-based video player</title>
-        <link rel="stylesheet" href="css/style.css">
-        <link rel="stylesheet" href="css/emoticon.css">
-        <link type="text/css" rel="stylesheet" href="css/video-js.min.css" />
-        <script>
-            // getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
-            if (window.location.protocol == "file:") {
-                alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
-            } else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
-                window.location.protocol = "https";
-            }
-        </script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    </head>
-    <body>
-    <script src="./js/utils.js"></script>
-    <script src="./js/clmtrackr/clm.js"></script>
-    <script src="./js/clmtrackr/clmtrackr.js"></script>
-    <script src="./js/models/model_pca_20_svm_emotionDetection.js"></script>
-    <script src="./js/clmtrackr/Stats.js"></script>
-    <script src="./js/models/d3.min.js"></script>
-    <script src="./js/models/emotion_classifier.js"></script>
-    <script src="./js/models/emotionmodel.js"></script>
+    <meta charset="UTF-8">
+    <title>An emotion-based video player</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/emoticon.css">
+    <link rel="stylesheet" href="css/content.css">
+    <link type="text/css" rel="stylesheet" href="css/video-js.min.css" />
+    <link href="//vjs.zencdn.net/5.8/video-js.min.css" rel="stylesheet">
+    <script>
+        // getUserMedia only works over https in Chrome 47+, so we redirect to https. Also notify user if running from file.
+        if (window.location.protocol == "file:") {
+            alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
+        } else if (window.location.hostname !== "localhost" && window.location.protocol !== "https:"){
+            window.location.protocol = "https";
+        }
+    </script>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/logo-nav.css" rel="stylesheet">
+    <link href="css/content.css" rel="stylesheet">
 
-    <div id="container">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/jquery/dist/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</head>
+<body>
+    <script src="//vjs.zencdn.net/5.8/video.min.js"></script>
+    <script src="js/video.js/video.min.js"></script>
+    <script src="js/video-js/video.js"></script>
+
+    <script src="js/Youtube.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/clmtrackr/clm.js"></script>
+    <script src="js/clmtrackr/clmtrackr.js"></script>
+    <script src="js/models/model_pca_20_svm_emotionDetection.js"></script>
+    <script src="js/clmtrackr/Stats.js"></script>
+    <script src="js/models/d3.min.js"></script>
+    <script src="js/models/emotion_classifier.js"></script>
+    <script src="js/models/emotionmodel.js"></script>
+    
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <img src="http://placehold.it/150x50&text=Logo" alt="">
+                </a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="expressions.html" target="content">Expressions</a>
+                    </li>
+                    <li>
+                        <a href="viewer.html" target="content">Watch it!</a>
+                    </li>
+                    <li>
+                        <a href="timeline.html" target="content">Results</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+    
+    <!-- Page Content -->
+    <div class="text-container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Expressions</h1>
+                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="vid_container">
         <video id="videoel" width="400" height="300" preload="auto" loop></video>
         <canvas id="overlay" width="400" height="300"></canvas>
     </div>
+
     <div id="emotion_container">
         <div id="emotion_icons">
             <img class="emotion_icon" id="icon1" src="media/icons/angry.png">
@@ -39,17 +113,47 @@
         </div>
         <div id='emotion_chart'></div>
     </div>
-        <div id="controls">
+   
+    <div id="controls">
         <input class="btn" type="button" value="wait, loading video" disabled="disabled" onclick="startVideo()" id="startbutton"></input>
-        <input class="btn" type="button" value="stop" disabled=null onclick="startPlayer()" id="startplayer"></input>
+        <input class="btn" type="button" value="watch it!" disabled="enabled" onclick="showPlayer()" id="showplayer"></input>
     </div>
+
+    <video id="youtube_player" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" data-setup='{}'>
+      <source src="media/Beetlejuice french scene - YouTube_360p.mp4" type="video/mp4">
+      <p class="vjs-no-js">
+        To view this video please enable JavaScript, and consider upgrading to a web browser
+        that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+      </p>
+    </video>
 
     <script src="js/index.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
     <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyBI1lAq_sWUkSyuw6_q9Tp4Xq57pTqQLUU",
+            authDomain: "neurocinema-a859d.firebaseapp.com",
+            databaseURL: "https://neurocinema-a859d.firebaseio.com",
+            storageBucket: "neurocinema-a859d.appspot.com",
+        };
+        firebase.initializeApp(config);
+
         var vid = document.getElementById('videoel');
+        var video_player = document.getElementById('youtube_player');
+        var video = document.querySelector("#youtube_player video");
         var overlay = document.getElementById('overlay');
         var overlayCC = overlay.getContext('2d');
+        // document.getElementById('youtube_player').style.visibility = 'hidden';
+
+        /********** check and set up video/webcam **********/
+        function enablestart() {
+            var startbutton = document.getElementById('startbutton');
+            startbutton.value = "start";
+            startbutton.disabled = null;
+            var showbutton = document.getElementById('showplayer');
+            showbutton.disabled = null;
+        }
 
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
         window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
@@ -64,7 +168,7 @@
                     videoSelector = "video";
                 }
             };
-
+        
             navigator.getUserMedia(videoSelector, function( stream ) {
                 if (vid.mozCaptureStream) {
                     vid.mozSrcObject = stream;
@@ -80,16 +184,14 @@
             //insertAltVideo(vid);
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
         }
-        
-        function enablestart() {
-            var startbutton = document.getElementById('startbutton');
-            startbutton.value = "start";
-            startbutton.disabled = null;
-        }
 
-        /*********** setup of emotion detection *************/
         vid.addEventListener('canplay', enablestart, false);
-        
+        var today = new Date();
+        var day = parseInt(today.toISOString().replaceAll('-','').split('T')[0])
+        var data = 'emotion'
+        var path = data + '/' + today.toISOString().replaceAll(':','')
+        path = path.replaceAll('-','').replace('.','')
+        /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
         var timestamp = ""; //["", "", "", ""];
         var enames = ["angry", "sad", "surprised", "happy"]
@@ -105,6 +207,16 @@
             drawLoop();
         }
 
+        function showPlayer() {
+            video_player = videojs('youtube_player');
+            document.getElementById('youtube_player').style.visibility = 'visible';
+            // load video
+            video_player.load();
+            video_player.requestFullscreen();
+            // start playing
+            video_player.play();
+        }
+
         function drawLoop() {
             requestAnimFrame(drawLoop);
             overlayCC.clearRect(0, 0, 400, 300);
@@ -114,7 +226,8 @@
             }
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
-
+            var player = videojs('youtube_player');
+            var ts = player.currentTime();
             if (er) {
                 updateData(er);
                 for (var i = 0;i < er.length;i++) {
@@ -130,8 +243,9 @@
         var ec = new emotionClassifier();
         ec.init(emotionModel);
         var emotionData = ec.getBlank();    
-
+        
         /************ d3 code for barchart *****************/
+
         var margin = {top : 20, right : 20, bottom : 10, left : 40},
             width = 400 - margin.left - margin.right,
             height = 100 - margin.top - margin.bottom;
@@ -196,7 +310,7 @@
                 .attr("y", function(datum) { return height - y(datum.value); })
                 .text(function(datum) { return datum.value.toFixed(1);});
 
-            // enter
+            // enter 
             rects.enter().append("svg:rect");
             texts.enter().append("svg:text");
 
@@ -210,7 +324,7 @@
         stats = new Stats();
         stats.domElement.style.position = 'absolute';
         stats.domElement.style.top = '0px';
-        document.getElementById('container').appendChild( stats.domElement );
+        document.getElementById('vid_container').appendChild( stats.domElement );
 
         // update stats on every iteration
         document.addEventListener('clmtrackrIteration', function(event) {
