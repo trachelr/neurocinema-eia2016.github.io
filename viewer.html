@@ -37,6 +37,16 @@
 <body>
     <link href="css/default.css" rel="stylesheet">
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="js/jquery/dist/jquery.js"></script>
+    <script src="js/jquery-ui/jquery-ui.min.js"></script>        
+    <script src="js/raphael/raphael.js"></script>
+    <!-- style-player -->        
+    <link href="css/amalia.js.min.css" rel="stylesheet">
+    <!-- /style-player -->        
+    <!-- script-player -->        
+    <script src="js/amalia.js/amalia.js.min.js"></script>
+    <script src="js/amalia.js/amalia.js-plugin-timeline.min.js"></script>
+    <script type="text/javascript" src="js/amalia.js-yt-player.min.js"></script>
 
     <script src="js/utils.js"></script>
     <script src="js/clmtrackr/clm.js"></script>
@@ -83,47 +93,36 @@
         <!-- /.container -->
     </nav>
     
-    <!-- Page Content -->
-    <div class="text-container">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1>Watch it!</h1>
-                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
-            </div>
-        </div>
-    </div>
-    
     <div id="player"></div>
     <video id="videoel" width="400" height="300" preload="auto" loop hidden></video>
-    <script>
-        // 2. This code loads the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
-
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // 3. This function creates an <iframe> (and YouTube player)
-        //    after the API code downloads.
-        var player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '390',
-                width: '640',
-                videoId: 'M7lc1UVf-VE',
-                events: {
-                    'onReady': onPlayerReady
+    
+    <script>    
+        // Initialize Amalia.js Player
+        var player = null;
+        var curtime = null
+        // 2. Function to execute when the DOM is fully loaded
+        $(document).ready(function () {
+            // 3. Init player with default parameters
+            $("#player").mediaPlayer({
+                src: "media/Beetlejuice french scene - YouTube_360p.mp4",
+                callbacks: {
+                    onReady: 'onReady'
                 }
             });
-        }
+        });
 
         // 4. The API will call this function when the video player is ready.
-        function onPlayerReady(event) {
-            event.target.playVideo();
+        function onReady() {
+            player = $('#player').data('fr.ina.amalia.player').getPlayer();
+            // Set event listener on time change.
+            $('#player').on('fr.ina.amalia.player.PlayerEventType.TIME_CHANGE', onTimeChange);
         }
 
-        function stopVideo() {
-            player.stopVideo();
+        // 5. Function will call on click to button play
+        function playVideo() {
+            if (player !== null) {
+                player.play();
+            }
         }
 
         // Initialize Firebase
@@ -178,21 +177,26 @@
         }
 
         // guess the viewer id from cookies
-        var viwer_id = getCookie("viwer_id");
-        if (viwer_id == "") {
+        var viewer_id = getCookie("viwer_id");
+        if (viewer_id == "") {
             var today = new Date().toISOString();
             setCookie("viwer_id", today, 30);
+            setCookie("nb_view", 1, 30);
+        } else {
+            // count number of views
+            var nb_view = getCookie("nb_view");
+            setCookie("nb_view", parseInt(nb_view) + 1, 30);
         }
 
-
-        var day = parseInt(viwer_id.replaceAll('-','').split('T')[0])
+        var day = parseInt(viewer_id.replaceAll('-','').split('T')[0])
         var data = 'emotions'
-        var path = data + '/' + viwer_id.replaceAll(':','')
+        var path = data + '/' + viewer_id.replaceAll(':','')
         path = path.replaceAll('-','').replace('.','')
         /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
         var timestamp = ""; //["", "", "", ""];
-        var enames = ["angry", "sad", "surprised", "happy"]
+        var enames = ['angry' + nb_view, 'sad' + nb_view, 
+                      'surprised' + nb_view, 'happy' + nb_view]
         var ctrack = new clm.tracker({useWebGL : true});
         ctrack.init(pModel);
 
@@ -229,7 +233,7 @@
                     // remember only the first time stamp
                     console.log('not saving timestamp...')
                 } else {
-                    console.log('writing timestamp' + timestamp)
+                    newtime = "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms)
                     var ref = firebase.database().ref(path + '/' + videoID + '/localisation/0/sublocalisations/localisation');
                     // sync down from server
                     var list = [];
@@ -237,29 +241,33 @@
                     // this is the correct way to change an array
                     list.push({
                         tcin: timestamp,
-                        tcout: "00:".concat(min).concat(":").concat(sec).concat(".").concat(ms),
+                        tcout: newtime,
                         tclevel: 1
                     });
                     ref.set(list);
-                    console.log('writting: ' + timestamp)
+                    console.log('writting: ' + newtime)
                     timestamp = "";
                     last = "";
                 }
             }
         }
 
-        function drawLoop() {
-            requestAnimFrame(drawLoop);
+        function detectEmotionLoop() {
+            requestAnimFrame(detectEmotionLoop);
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
-            var ts = player.getCurrentTime();
+            if (player !== null) {
+                curtime = player.getCurrentTime();
+            } else {
+                curtime = 0;
+            }
             if (er) {
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
                         // console.log(enames[i] + ': ' + er[i].value)
-                        var minnow = String(ts / 60).split('.')[0].pad(2);
-                        var secnow = String(ts).split('.')[0].pad(2);
-                        var msnow = String(String(ts).split('.')[1]).substr(0,4)
+                        var minnow = String(curtime / 60).split('.')[0].pad(2);
+                        var secnow = String(curtime).split('.')[0].pad(2);
+                        var msnow = String(String(curtime).split('.')[1]).substr(0,4)
                         writeEmotionSegment(enames[i], minnow, secnow, msnow);
                     }
                 }
@@ -272,11 +280,7 @@
         
         ctrack.start(vid);
         // start loop to draw face
-        drawLoop();
-        // load video
-        player.requestFullscreen();
-        // start playing
-        player.play();
+        detectEmotionLoop();
         
         </script>
     </body>

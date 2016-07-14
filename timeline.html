@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/favicon.ico">
     <link href="css/default.css" rel="stylesheet">
-
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/logo-nav.css" rel="stylesheet">
+    <link href="css/content.css" rel="stylesheet">
+    
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="js/jquery/dist/jquery.js"></script>
     <script src="js/jquery-ui/jquery-ui.min.js"></script>        
@@ -19,13 +24,7 @@
     <script src="js/amalia.js/amalia.js-plugin-timeline.min.js"></script>
     <script type="text/javascript" src="js/amalia.js-yt-player.min.js"></script>
     <!-- /script-player -->
-
-    <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="css/logo-nav.css" rel="stylesheet">
-    <link href="css/content.css" rel="stylesheet">
-
+    <script src="js/utils.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -80,54 +79,60 @@
                 </div>
                 <div id="timeline"></div>
                 <script>
+                    var titles = ['Angry face', 'Happy face', 'Sad face', 'Surprised face']
+                    var metas = ['angry', 'happy', 'sad', 'surprised']
+                    var colors = ['#ff1f1f', '#fe81cf', '#416fff', '#eeff3b']
+                    var datapath = 'https://neurocinema-a859d.firebaseio.com/emotions/';
+                    // guess the viewer id from cookies
+                    var viwerpath = getCookie("viwer_id");
+                    var nb_view = getCookie("nb_view");
+                    if (viwerpath == "") {
+                        var today = new Date().toISOString();
+                        setCookie("viwer_id", today, 30);
+                        setCookie("nb_view", 1, 30);
+                    }
+
+                    var viewerpath = viwerpath.replaceAll(':','')
+                    viewerpath = viewerpath.replaceAll('-','').replace('.','')
+                    var path = datapath + viewerpath
+
+                    // aggregate data across views
+                    var data_list = [];
+                    var line_list = [];
+                    for (var i = 0;i < nb_view; i++) {
+                        data_list.push(path + '/angry' + nb_view + '.json');
+                        data_list.push(path + '/happy' + nb_view + '.json');
+                        data_list.push(path + '/sad' + nb_view + '.json');
+                        data_list.push(path + '/surprised' + nb_view + '.json');
+                        log.console('loading' + path + '/angry' + nb_view + '.json');
+                        for (var j = 0;j < 4; j++) {
+                            line_list.push({
+                                title : title[j],
+                                type : 'segment',
+                                metadataId : metas[j],
+                                color : colors[j]
+                            });
+                        }
+                    }
+
                     $( function () {
                         $( "#defaultPlayer" ).mediaPlayer( {
-                            player: "fr.ina.amalia.player.YtPlayer",
+                            //player: "fr.ina.amalia.player.YtPlayer",
                             autoplay : false,
-                            //src : "media/Beetlejuice french scene - YouTube_360p.mp4",
-                            src: 'M7lc1UVf-VE', // Youtube video ID
+                            src : "media/Beetlejuice french scene - YouTube_360p.mp4",
+                            //src: 'M7lc1UVf-VE', // Youtube video ID
                             controlBar :
                                 {
                                     sticky : true
                                 },
                             plugins : {
-                                dataServices : [
-                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/angry.json',
-                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/happy.json',
-                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/sad.json',
-                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/surprised.json'
-                                ],
+                                dataServices : data_list,
                                 list : [
                                     {
                                         'className' : 'fr.ina.amalia.player.plugins.TimelinePlugin',
                                         'container' : '#timeline',
                                         'parameters' : {
-                                            listOfLines : [
-                                                {
-                                                    title : 'Angry face',
-                                                    type : 'segment',
-                                                    metadataId : 'angy',
-                                                    color : '#F00'
-                                                },
-                                                {
-                                                    title : 'Happy face',
-                                                    type : 'segment',
-                                                    metadataId : 'happy',
-                                                    color : '#FF0'
-                                                },
-                                                {
-                                                    title : 'Sad face',
-                                                    type : 'segment',
-                                                    metadataId : 'sad',
-                                                    color : '#4A0'
-                                                },
-                                                {
-                                                    title : 'Surprised face',
-                                                    type : 'segment',
-                                                    metadataId : 'surprised',
-                                                    color : '#340'
-                                                }
-                                            ]
+                                            listOfLines : line_list
                                         }
                                     }
                                 ]
