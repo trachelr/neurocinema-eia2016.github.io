@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Timeline viewer</title>>
+    <title>Timeline viewer</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="images/favicon.ico">
     <link href="css/default.css" rel="stylesheet">
+
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script src="js/jquery/dist/jquery.js"></script>
     <script src="js/jquery-ui/jquery-ui.min.js"></script>        
     <script src="js/raphael/raphael.js"></script>
@@ -14,7 +16,8 @@
     <!-- /style-player -->        
     <!-- script-player -->        
     <script src="js/amalia.js/amalia.js.min.js"></script>
-    <script src="js/amalia.js/amalia.js-plugin-timeline.min.js"></script>      
+    <script src="js/amalia.js/amalia.js-plugin-timeline.min.js"></script>
+    <script type="text/javascript" src="js/amalia.js-yt-player.min.js"></script>
     <!-- /script-player -->
 
     <!-- Bootstrap Core CSS -->
@@ -64,76 +67,74 @@
         <div class="row">
             <div class="col-lg-12">
                 <h1>Your results</h1>
-                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
+                <p>This demo is used to track facial features and analyse their emotional response to on-screen media.</p>
             </div>
         </div>
     </div>
     
-        <div class="container">
-            <div class="header">
-                <h1>Plugin timeline</h1>  
-            </div>
-            <div class="content">           
-                <div class="demo">
-                    <div style="height: 350px;">
-                        <div id="defaultPlayer"></div>
-                    </div>
-                    <div id="timeline"></div>
-                    <script>
-                        $( function () {
-                            $( "#defaultPlayer" ).mediaPlayer( {
-                                autoplay : false,
-                                src : "media/Beetlejuice french scene - YouTube_360p.mp4",
-                                controlBar :
-                                    {
-                                        sticky : true
-                                    },
-                                plugins : {
-                                    dataServices : [
-                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/angry.json',
-                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/happy.json',
-                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/sad.json',
-                                        'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/surprised.json'
-                                    ],
-                                    list : [
-                                        {
-                                            'className' : 'fr.ina.amalia.player.plugins.TimelinePlugin',
-                                            'container' : '#timeline',
-                                            'parameters' : {
-                                                listOfLines : [
-                                                    {
-                                                        title : 'Angry face',
-                                                        type : 'segment',
-                                                        metadataId : 'angy',
-                                                        color : '#F00'
-                                                    },
-                                                    {
-                                                        title : 'Happy face',
-                                                        type : 'segment',
-                                                        metadataId : 'happy',
-                                                        color : '#FF0'
-                                                    },
-                                                    {
-                                                        title : 'Sad face',
-                                                        type : 'segment',
-                                                        metadataId : 'sad',
-                                                        color : '#4A0'
-                                                    },
-                                                    {
-                                                        title : 'Surprised face',
-                                                        type : 'segment',
-                                                        metadataId : 'surprised',
-                                                        color : '#340'
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            } );
-                        } );
-                    </script>
+    <div class="container">
+        <div class="content">           
+            <div class="demo">
+                <div style="height: 350px;">
+                    <div id="defaultPlayer"></div>
                 </div>
+                <div id="timeline"></div>
+                <script>
+                    $( function () {
+                        $( "#defaultPlayer" ).mediaPlayer( {
+                            player: "fr.ina.amalia.player.YtPlayer",
+                            autoplay : false,
+                            //src : "media/Beetlejuice french scene - YouTube_360p.mp4",
+                            src: 'M7lc1UVf-VE', // Youtube video ID
+                            controlBar :
+                                {
+                                    sticky : true
+                                },
+                            plugins : {
+                                dataServices : [
+                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/angry.json',
+                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/happy.json',
+                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/sad.json',
+                                    'https://neurocinema-a859d.firebaseio.com/emotion/20160713T131620223Z/surprised.json'
+                                ],
+                                list : [
+                                    {
+                                        'className' : 'fr.ina.amalia.player.plugins.TimelinePlugin',
+                                        'container' : '#timeline',
+                                        'parameters' : {
+                                            listOfLines : [
+                                                {
+                                                    title : 'Angry face',
+                                                    type : 'segment',
+                                                    metadataId : 'angy',
+                                                    color : '#F00'
+                                                },
+                                                {
+                                                    title : 'Happy face',
+                                                    type : 'segment',
+                                                    metadataId : 'happy',
+                                                    color : '#FF0'
+                                                },
+                                                {
+                                                    title : 'Sad face',
+                                                    type : 'segment',
+                                                    metadataId : 'sad',
+                                                    color : '#4A0'
+                                                },
+                                                {
+                                                    title : 'Surprised face',
+                                                    type : 'segment',
+                                                    metadataId : 'surprised',
+                                                    color : '#340'
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        } );
+                    } );
+                </script>
             </div>
         </div>
     </body>
