@@ -68,17 +68,17 @@
         </div>
         <!-- /.container -->
     </nav>
-    <iframe src="home.html" name="content" seamless>
-        <!-- Page Content -->
-        <div class="text-container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1>Access to your webcam</h1>
-                    <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
-                </div>
+    
+    <!-- Page Content -->
+    <div class="text-container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>Access to your webcam</h1>
+                <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
             </div>
         </div>
-    </iframe>
+    </div>
+    
     <!-- /.container -->
     <script>
         /********** check and set up video/webcam **********/
@@ -95,6 +95,18 @@
                     videoSelector = "video";
                 }
             };
+
+            navigator.getUserMedia(videoSelector, function( stream ) {
+                if (vid.mozCaptureStream) {
+                    vid.mozSrcObject = stream;
+                } else {
+                    vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+                }
+                vid.play();
+            }, function() {
+                //insertAltVideo(vid);
+                alert("There was some problem trying to fetch video from your webcam. If you have a webcam, please make sure to accept when the browser asks for access to your webcam.");
+            });
         } else {
             //insertAltVideo(vid);
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
