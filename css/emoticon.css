@@ -63,7 +63,7 @@ h2 {
 }
 
 #emotion_container {
-	width: 600px;
+	width: 60px;
 }
 
 #emotion_icons {
@@ -81,7 +81,7 @@ h2 {
 
 #emotion_chart, #emotion_icons {
 	margin: 0 auto;
-	width : 400px;
+	width : 40px;
 }
 
 #icon1, #icon2, #icon3, #icon4, #icon5, #icon6 {
