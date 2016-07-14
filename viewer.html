@@ -177,10 +177,17 @@
             alert("This demo depends on getUserMedia, which your browser does not seem to support. :(");
         }
 
-        var today = new Date();
-        var day = parseInt(today.toISOString().replaceAll('-','').split('T')[0])
-        var data = 'emotion'
-        var path = data + '/' + today.toISOString().replaceAll(':','')
+        // guess the viewer id from cookies
+        var viwer_id = getCookie("viwer_id");
+        if (viwer_id == "") {
+            var today = new Date().toISOString();
+            setCookie("viwer_id", today, 30);
+        }
+
+
+        var day = parseInt(viwer_id.replaceAll('-','').split('T')[0])
+        var data = 'emotions'
+        var path = data + '/' + viwer_id.replaceAll(':','')
         path = path.replaceAll('-','').replace('.','')
         /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
