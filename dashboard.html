@@ -75,45 +75,17 @@
         var angry_c = 0;
         var sad_c = 0;
         var surp_c = 0;
-        var view_count = 0;
+        var viewer_count = 0;
         for (i = 0; i < 60; i++) {
-            times[i] = i;
-            //times.push(['00:00:' + String(i).pad(2) + '.000'])
+            //times[i] = i;
+            times[i] = '00:00:' + String(i).pad(2)
             happy_pts[i] = 0;
             surp_pts[i] = 0;
             angry_pts[i] = 0;
             sad_pts[i] = 0;
         }
 
-        window.onload = function(){
-            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/emotions");
-            dataRef.once("value", function(allViewerData) {
-                allViewerData.forEach(function(dataSnapshot) {
-                    // Will be called with a messageSnapshot for each child under the /messages/ node
-                    var vkey = dataSnapshot.key();  // e.g. "Viewer ID"
-                    view_count = view_count + 1;
-                    console.log("getting viewer: " + vkey);
-                    happy_pts, happy_c = happy_dataset(vkey, happy_pts);
-                    counters[1] += happy_c
-                    surp_pts, surp_c = surprised_dataset(vkey, happy_pts);
-                    counters[3] += surp_c
-                    angry_pts, angry_c = angry_dataset(vkey, angry_pts);
-                    counters[0] += angry_c
-                    sad_pts, sad_c = sad_dataset(vkey, sad_pts);
-                    counters[2] += sad_c
-                });
-            }).then(plot_data(counters, view_count)).then(function myFunction() {
-                    document.getElementById("audience").innerHTML = String(view_count) + "viewers included in the database.";
-            });
-        }
-
         var plotDiv = document.getElementById('plot');
-        var traces = [
-            {x: times, y: sad_pts, fill: 'tozeroy', name:'sad'},
-            {x: times, y: surp_pts, fill: 'tonexty', name: 'surprised'},
-            {x: times, y: angry_pts, fill: 'tonexty', name: 'angry'},
-            {x: times, y: happy_pts, fill: 'tonexty', name:'happy'},
-        ];
 
         var layout = {
             title: 'stacked and filled emotions chart',
@@ -125,7 +97,6 @@
                   color: 'lightgrey'
                 },
                 showticklabels: true,
-                tickangle: 45,
                 tickfont: {
                   family: 'Old Standard TT, serif',
                   size: 14,
@@ -140,14 +111,45 @@
                   color: 'lightgrey'
                 },
                 showticklabels: true,
-                tickangle: 45,
                 tickfont: {
                   family: 'Old Standard TT, serif',
                   size: 14,
                   color: 'black'
-                }
+                },
+                autotick: false,
+                ticks: 'outside',
+                ticklen: 16,
+                tickwidth: 8,
             }
         };
+        
+        window.onload = function(){
+            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/emotions");
+            dataRef.on("value", function(allViewerData) {
+                allViewerData.forEach(function(dataSnapshot) {
+                    // Will be called with a messageSnapshot for each child under the /messages/ node
+                    var vkey = dataSnapshot.key();  // e.g. "Viewer ID"
+                    viewer_count = viewer_count + 1;
+                    console.log("getting viewer: " + vkey);
+                    happy_pts, happy_c = happy_dataset(vkey, happy_pts);
+                    counters[1] += happy_c
+                    surp_pts, surp_c = surprised_dataset(vkey, happy_pts);
+                    counters[3] += surp_c
+                    angry_pts, angry_c = angry_dataset(vkey, angry_pts);
+                    counters[0] += angry_c
+                    sad_pts, sad_c = sad_dataset(vkey, sad_pts);
+                    counters[2] += sad_c
+                });
+                plot_data(counters, viewer_count);
+                var traces = [
+                    {x: times, y: sad_pts, fill: 'tozeroy', name:'sad', line: {shape: 'spline'}},
+                    {x: times, y: happy_pts, fill: 'tonexty', name:'happy', line: {shape: 'spline'}},
+                    {x: times, y: surp_pts, fill: 'tonexty', name: 'surprised', line: {shape: 'spline'}},
+                    {x: times, y: angry_pts, fill: 'tonexty', name: 'angry', line: {shape: 'spline'}}
+                ];
+                Plotly.newPlot(plotDiv, stackedArea(traces), layout);
+            });
+        }
 
         function stackedArea(traces) {
             for(var i=1; i<traces.length; i++) {
@@ -157,7 +159,7 @@
             }
             return traces;
         }
-        Plotly.newPlot(plotDiv, stackedArea(traces), layout);
+
     </script>
 </body>
 </html>

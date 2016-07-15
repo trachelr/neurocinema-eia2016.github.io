@@ -1,4 +1,5 @@
 function plot_data(counters, view_count) {
+    document.getElementById("audience").innerHTML = String(viewer_count) + "viewers included in the database."
     plot_happy_gauge("happyscore", counters[1], view_count);
     plot_surprise_gauge("surprisedscore", counters[3], view_count);
     plot_angry_gauge("angryscore", counters[0], view_count);
@@ -8,12 +9,13 @@ function plot_data(counters, view_count) {
 
 function plot_happy_gauge(divname, level, total){
     // Enter a speed between 0 and 180
-    var level = level; //happy_c;
+    //total = 100
+    var level = happy_c
     var labels = []
     var step = total/6;
-    for (i = 0; i < total; i + step) {
-        labels.push([i + step])
-    }
+    //for (i = total; i > 0; i - step) {
+    //    labels.push(["" + String(i) + "-" + String(i - step)])
+    //}
     // Trig to calc meter point
     var degrees = total - level,
          radius = .5;
@@ -46,7 +48,7 @@ function plot_happy_gauge(divname, level, total){
                        'rgba(255, 133, 51, .5)', 'rgba(255, 163, 102, .5)',
                        'rgba(255, 194, 153, .5)', 'rgba(255, 224, 204, .5)',
                        'rgba(255, 255, 255, 0)']},
-      labels: labels, //['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
+      labels: ['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
       hoverinfo: 'label',
       hole: .5,
       type: 'pie',
@@ -77,11 +79,6 @@ function plot_happy_gauge(divname, level, total){
 function plot_angry_gauge(divname, level, total){
     // Enter a speed between 0 and 180
     var level = level; //happy_c;
-    var labels = []
-    var step = total/6;
-    for (i = 0; i < total; i + step) {
-        labels.push([i + step])
-    }
     // Trig to calc meter point
     var degrees = total - level,
          radius = .5;
@@ -114,7 +111,7 @@ function plot_angry_gauge(divname, level, total){
                        'rgba(255, 51, 51, .5)', 'rgba(255, 102, 102, .5)', 
                        'rgba(255, 153, 153, .5)', 'rgba(255, 204, 204, .5)',
                        'rgba(255, 255, 255, 0)']},
-      labels: labels, //['-', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
+      labels: ['-', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
       hoverinfo: 'label',
       hole: .5,
       type: 'pie',
@@ -145,11 +142,6 @@ function plot_angry_gauge(divname, level, total){
 function plot_surprise_gauge(divname, level, total){
     // Enter a speed between 0 and 180
     var level = level; //happy_c;
-    var labels = []
-    var step = total/6;
-    for (i = 0; i < total; i + step) {
-        labels.push([i + step])
-    }
     // Trig to calc meter point
     var degrees = total - level,
          radius = .5;
@@ -182,7 +174,7 @@ function plot_surprise_gauge(divname, level, total){
                        'rgba(170, 202, 42, .5)', 'rgba(202, 209, 95, .5)',
                        'rgba(210, 206, 145, .5)', 'rgba(232, 226, 202, .5)',
                        'rgba(255, 255, 255, 0)']},
-      labels: labels, //['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
+      labels: ['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
       hoverinfo: 'label',
       hole: .5,
       type: 'pie',
@@ -214,10 +206,6 @@ function plot_sad_gauge(divname, level, total){
     // Enter a speed between 0 and 180
     var level = level; //happy_c;
     var labels = []
-    var step = total/6;
-    for (i = 0; i < total; i + step) {
-        labels.push([i + step])
-    }
     // Trig to calc meter point
     var degrees = total - level,
          radius = .5;
@@ -250,7 +238,7 @@ function plot_sad_gauge(divname, level, total){
                        'rgba(170, 202, 42, .5)', 'rgba(202, 209, 95, .5)',
                        'rgba(210, 206, 145, .5)', 'rgba(232, 226, 202, .5)',
                        'rgba(255, 255, 255, 0)']},
-      labels: labels, //['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
+      labels: ['151-180', '121-150', '91-120', '61-90', '31-60', '0-30', ''],
       hoverinfo: 'label',
       hole: .5,
       type: 'pie',
