@@ -12,6 +12,17 @@
         <!-- Custom CSS -->
         <link href="css/logo-nav.css" rel="stylesheet">
         <link href="css/content.css" rel="stylesheet">
+        <link href="css/default.css" rel="stylesheet">
+        <script src="https://www.youtube.com/iframe_api"></script>
+        <script src="js/jquery/dist/jquery.js"></script>
+        <script src="js/jquery-ui/jquery-ui.min.js"></script>        
+        <script src="js/raphael/raphael.js"></script>
+        <!-- style-player -->        
+        <link href="css/amalia.js.min.css" rel="stylesheet">
+        <!-- /style-player -->        
+        <!-- script-player -->        
+        <script src="js/amalia.js/amalia.js.min.js"></script>
+        <script type="text/javascript" src="js/amalia.js-yt-player.min.js"></script>
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -19,7 +30,6 @@
             <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
-        <link href="css/default.css" rel="stylesheet">
     </head>
     <body>
         <!-- Page Content -->
@@ -30,6 +40,40 @@
                     <p>This demo is used to track participants' facial features and to analyse their emotional response to on-screen media.</p>
                 </div>
             </div>
+            <div id="player"></div>
         </div>
+
+        <script>    
+            // Initialize Amalia.js Player
+            var player = null;
+            var curtime = null
+            // 2. Function to execute when the DOM is fully loaded
+            $(document).ready(function () {
+                // 3. Init player with default parameters
+                $("#player").mediaPlayer({
+                    player: "fr.ina.amalia.player.YtPlayer",
+                    //src: "media/Beetlejuice french scene - YouTube_360p.mp4",
+                    src: 'M7lc1UVf-VE', 
+                    autoplay: false,
+                    callbacks: {
+                        onReady: 'onReady'
+                    }
+                });
+            });
+
+            // 4. The API will call this function when the video player is ready.
+            function onReady() {
+                player = $('#player').data('fr.ina.amalia.player').getPlayer();
+                // start video
+                playVideo();
+            }
+
+            // 5. Function will call on click to button play
+            function playVideo() {
+                if (player !== null) {
+                    player.play();
+                }
+            }
+        </script>
     </body>
 </html>

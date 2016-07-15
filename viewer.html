@@ -45,6 +45,7 @@
     <!-- /style-player -->        
     <!-- script-player -->        
     <script src="js/amalia.js/amalia.js.min.js"></script>
+    <script type="text/javascript" src="js/amalia.js-yt-player.min.js"></script>
 
     <script src="js/utils.js"></script>
     <script src="js/clmtrackr/clm.js"></script>
@@ -72,7 +73,9 @@
         $(document).ready(function () {
             // 3. Init player with default parameters
             $("#player").mediaPlayer({
-                src: "media/Beetlejuice french scene - YouTube_360p.mp4",
+                player: "fr.ina.amalia.player.YtPlayer",
+                //src: "media/Beetlejuice french scene - YouTube_360p.mp4",
+                src: 'M7lc1UVf-VE', 
                 autoplay: false,
                 callbacks: {
                     onReady: 'onReady'
