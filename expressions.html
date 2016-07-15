@@ -150,16 +150,6 @@
             drawLoop();
         }
 
-        function showPlayer() {
-            video_player = videojs('youtube_player');
-            document.getElementById('youtube_player').style.visibility = 'visible';
-            // load video
-            video_player.load();
-            video_player.requestFullscreen();
-            // start playing
-            video_player.play();
-        }
-
         function drawLoop() {
             requestAnimFrame(drawLoop);
             overlayCC.clearRect(0, 0, 400, 300);

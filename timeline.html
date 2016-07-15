@@ -47,7 +47,8 @@
                 <script>
                     var titles = ['Angry face', 'Happy face', 'Sad face', 'Surprised face']
                     var metas = ['angry', 'happy', 'sad', 'surprised']
-                    var colors = ['#ff1f1f', '#fe81cf', '#416fff', '#eeff3b']
+                    //var colors = ['#ff1f1f', '#fe81cf', '#416fff', '#eeff3b']
+                    var colors = ['#ff1f', '#fe81', '#416f', '#eeff']
                     var datapath = 'https://neurocinema-a859d.firebaseio.com/emotions/';
                     // guess the viewer id from cookies
                     var viwerpath = getCookie("viwer_id");
@@ -57,7 +58,7 @@
                         setCookie("viwer_id", today, 30);
                         setCookie("nb_view", "1", 30);
                     }
-
+                    nb_view = parseInt(nb_view);
                     var viewerpath = viwerpath.replaceAll(':','')
                     viewerpath = viewerpath.replaceAll('-','').replace('.','')
                     var path = datapath + viewerpath
@@ -65,19 +66,21 @@
                     // aggregate data across views
                     var data_list = [];
                     var line_list = [];
-                    var emo_list = ['angry/', 'sad/', 'surprised/', 'happy/']
-                    for (var iview = 0;iview < nb_view; i++) {
-                        console.log('loading' + path + '/angry/' + iview + '.json');
-                        for (var i = 0;i < 4; i++) {
-                            data_list.push(path + emo_list[i] + iview + '.json');
+                    var emo_list = ['angry/', 'happy/', 'sad/', 'surprised/']
+                    for (var iview = 0;iview < nb_view; iview++) {
+                        for (var i = 0; i < 4; i++) {
+                            view_id = String(iview).pad(3)
+                            data_list.push(path + '/' + emo_list[i] + view_id + '.json');
                             line_list.push({
-                                title : titles[i],
+                                title : titles[i] + ' (' + view_id + ')',
                                 type : 'segment',
-                                metadataId : metas[i],
+                                metadataId : metas[i] + view_id,
                                 color : colors[i]
                             });
                         }
                     }
+                    console.log(data_list)
+                    console.log(line_list)
 
                     $( function () {
                         $( "#defaultPlayer" ).mediaPlayer( {
