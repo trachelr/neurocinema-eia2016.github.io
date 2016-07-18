@@ -56,7 +56,9 @@
         <canvas id="overlay" width="400" height="300"></canvas>
     </div>
 
-    <script>    
+    <script>
+        // 1. Get the video id 
+        var videoId = sessionStorage.getItem("youtube-link")
         // 2. This code loads the IFrame Player API code asynchronously.
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -69,20 +71,21 @@
             player = new YT.Player('player', {
                 height: '340',
                 width: '560',
-                videoId: 'M7lc1UVf-VE',
+                videoId: videoId, //'M7lc1UVf-VE',
                 events: {
                     'onReady': onPlayerReady
                 }
             });
         }
+        
         // 4. The API will call this function when the video player is ready.
         function onPlayerReady(event) {
             event.target.playVideo();
         }
+
         function stopVideo() {
             player.stopVideo();
         }
-
 
         // Initialize Firebase
         var config = {
@@ -141,11 +144,13 @@
             setCookie("nb_view", parseInt(nb_view) + 1, 30);
         }
 
-        var day = parseInt(viewer_id.replaceAll('-','').split('T')[0])
+        // build path from viewer_id
+        var day = 
         var data = 'emotions'
         var path = data + '/' + viewer_id.replaceAll(':','')
-        path = path.replaceAll('-','').replace('.','')
+        path = path.replaceAll('-','').replace('.','') + '/' + videoId
         var ref = firebase.database().ref(path + '/');
+
         /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
         var timestamp = ""; //["", "", "", ""];
@@ -156,7 +161,7 @@
 
         for (var i = 0;i < enames.length; i++) {
             enames[i] = enames[i] + '/' + String(nb_view).pad(3)
-            // init firebase
+            // send a new data structure into firebase 
             firebase.database().ref(path + '/' + enames[i]).set({
                 localisation: [{
                     sublocalisations: {
@@ -215,6 +220,7 @@
             requestAnimFrame(detectEmotionLoop);
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
+            // get the current video timestamp
             if (player !== null) {
                 curtime = player.getCurrentTime();
             } else {
