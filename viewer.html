@@ -37,14 +37,6 @@
 <body>
     <link href="css/default.css" rel="stylesheet">
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="js/jquery/dist/jquery.js"></script>
-    <script src="js/jquery-ui/jquery-ui.min.js"></script>        
-    <script src="js/raphael/raphael.js"></script>
-    <!-- style-player -->        
-    <link href="css/amalia.js.min.css" rel="stylesheet">
-    <!-- /style-player -->        
-    <!-- script-player -->        
-    <script src="js/amalia.js/amalia.js.min.js"></script>
 
     <script src="js/utils.js"></script>
     <script src="js/clmtrackr/clm.js"></script>
@@ -65,38 +57,32 @@
     </div>
 
     <script>    
-        // Initialize Amalia.js Player
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
         var player = null;
-        var curtime = null
-        // 2. Function to execute when the DOM is fully loaded
-        $(document).ready(function () {
-            // 3. Init player with default parameters
-            $("#player").mediaPlayer({
-                src: "media/Beetlejuice french scene - YouTube_360p.mp4",
-                autoplay: false,
-                callbacks: {
-                    onReady: 'onReady'
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '340',
+                width: '560',
+                videoId: 'M7lc1UVf-VE',
+                events: {
+                    'onReady': onPlayerReady
                 }
             });
-        });
-
+        }
         // 4. The API will call this function when the video player is ready.
-        function onReady() {
-            player = $('#player').data('fr.ina.amalia.player').getPlayer();
-            // start video
-            vid.play();
-            // start tracking
-            ctrack.start(vid);
-            // start loop to draw face
-            detectEmotionLoop();
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+        function stopVideo() {
+            player.stopVideo();
         }
 
-        // 5. Function will call on click to button play
-        function playVideo() {
-            if (player !== null) {
-                player.play();
-            }
-        }
 
         // Initialize Firebase
         var config = {
