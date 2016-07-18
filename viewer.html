@@ -145,10 +145,10 @@
         }
 
         // build path from viewer_id
-        var day = 
+        var day = parseInt(viewer_id.replaceAll('-','').split('T')[0]);
         var data = 'emotions'
-        var path = data + '/' + viewer_id.replaceAll(':','')
-        path = path.replaceAll('-','').replace('.','') + '/' + videoId
+        var path = data + '/youtube/' + videoId + '/' + viewer_id.replaceAll(':','')
+        path = path.replaceAll('-','').replace('.','')
         var ref = firebase.database().ref(path + '/');
 
         /*********** setup of emotion detection *************/

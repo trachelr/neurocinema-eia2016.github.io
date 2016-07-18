@@ -25,6 +25,9 @@
     <script src="js/utils.js"></script>
     <script src="js/getfirebasedata.js"></script>
     <script src="js/plotIndicators.js"></script>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
     <!-- Latest compiled and minified plotly.js JavaScript -->
     <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
@@ -38,6 +41,23 @@
                 <p>Dashboard of indicators to analyse the emotional response of your audience.</p>
                 <div id="audience">0 viewers included in the database.</div>
             </div>
+            <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                  Videos
+                  <span class="caret"></span>
+           </button>
+            <ul id="VideoMenu" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <li role="presentation">
+                    <a role = "menuitem" tabindex = "-1" href = "#">A</a>
+                </li>
+
+                <li role = "presentation">
+                    <a role = "menuitem" tabindex = "-1" href = "#">B</a>
+                </li>
+
+                <li role = "presentation">
+                    <a role = "menuitem" tabindex = "-1" href = "#">C</a>
+                </li>
+            </ul>
         </div>
     </div>
     <div class="row">
@@ -58,6 +78,17 @@
     </div>
 
     <div id="plot" style="width: 100wv; height: 400px;"></div>
+    
+    <script type="text/javascript">
+        function add_video(name) {
+            var $li = $("<li>").attr("data-filtertext", name)
+                               .appendTo("#VideoMenu");
+
+            $("<a>").attr("href", "#")
+                    .text(name)
+                    .appendTo($li);
+        }
+    </script>
     
     <script type="text/javascript">
         var classes = ['angry', 'happy', 'sad', 'surprised']
@@ -121,7 +152,7 @@
         };
         
         window.onload = function(){
-            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/emotions");
+            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/emotions/youtube/");
             dataRef.on("value", function(allViewerData) {
                 allViewerData.forEach(function(dataSnapshot) {
                     // Will be called with a messageSnapshot for each child under the /messages/ node
@@ -146,6 +177,8 @@
                 ];
                 Plotly.newPlot(plotDiv, stackedArea(traces), layout);
             });
+            // Refresh the video list
+            $("#Menu").listview('refresh');
         }
 
         function stackedArea(traces) {
