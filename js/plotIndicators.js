@@ -10,7 +10,7 @@ function plot_data(counters, view_count) {
 function plot_happy_gauge(divname, level, total){
     // Enter a speed between 0 and 180
     //total = 100
-    var level = happy_c
+    var level = level
     var labels = []
     var step = total/6;
     //for (i = total; i > 0; i - step) {
@@ -204,7 +204,7 @@ function plot_surprise_gauge(divname, level, total){
 
 function plot_sad_gauge(divname, level, total){
     // Enter a speed between 0 and 180
-    var level = level; //happy_c;
+    var level = 100;//level; //happy_c;
     var labels = []
     // Trig to calc meter point
     var degrees = total - level,

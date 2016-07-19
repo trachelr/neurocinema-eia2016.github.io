@@ -39,25 +39,16 @@
             <div class="col-lg-12">
                 <h1>Dashboard</h1>
                 <p>Dashboard of indicators to analyse the emotional response of your audience.</p>
-                <div id="audience">0 viewers included in the database.</div>
             </div>
-            <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-                  Videos
-                  <span class="caret"></span>
-           </button>
-            <ul id="VideoMenu" class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                <li role="presentation">
-                    <a role = "menuitem" tabindex = "-1" href = "#">A</a>
-                </li>
-
-                <li role = "presentation">
-                    <a role = "menuitem" tabindex = "-1" href = "#">B</a>
-                </li>
-
-                <li role = "presentation">
-                    <a role = "menuitem" tabindex = "-1" href = "#">C</a>
-                </li>
-            </ul>
+            <div class="col-lg-12">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Video<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="VideoMenu"></ul>
+                    <div id="audience" margin-left="5px"> 0 viewers included in the database.</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
@@ -67,8 +58,6 @@
         <div class="col-sm-6">
             <div id="surprisedscore"></div>
         </div>
-    </div>
-    <div class="row">
         <div class="col-sm-6">
             <div id="angryscore"></div>
         </div>
@@ -80,12 +69,14 @@
     <div id="plot" style="width: 100wv; height: 400px;"></div>
     
     <script type="text/javascript">
-        function add_video(name) {
-            var $li = $("<li>").attr("data-filtertext", name)
+        function add_video(vkey, vname) {
+            var $li = $("<li>").attr("data-filtertext", vname)
                                .appendTo("#VideoMenu");
 
             $("<a>").attr("href", "#")
-                    .text(name)
+                    //.click(onmenu(name))
+                    .click(function(){ onmenu(vkey); console.log("click" + vkey); })
+                    .text(vname)
                     .appendTo($li);
         }
     </script>
@@ -150,9 +141,29 @@
                 tickwidth: 8,
             }
         };
-        
+
         window.onload = function(){
-            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/emotions/youtube/");
+            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/youtube/");
+            dataRef.on("value", function(allVideoData) {
+                allVideoData.forEach(function(dataSnapshot) {
+                    // Will be called with a dataSnapshot for each child under the /youtube/ node
+                    var vkey = dataSnapshot.key();  // e.g. "Viewer ID"
+                    var vname = dataSnapshot.val().video.title;
+                    if (vname == null) {
+                        vname = vkey;
+                    }
+                    viewer_count = viewer_count + 1;
+                    console.log("getting viewer: " + vkey);
+                    add_video(vkey, vname);
+                });
+            });
+            // Refresh the video list
+            //$("#VideoMenu").listview('refresh');
+        }
+
+        function onmenu(name){
+            var dataRef = new Firebase("https://neurocinema-a859d.firebaseio.com/youtube/" + name);
+            console.log("plotting video results for: " + name);
             dataRef.on("value", function(allViewerData) {
                 allViewerData.forEach(function(dataSnapshot) {
                     // Will be called with a messageSnapshot for each child under the /messages/ node
@@ -177,8 +188,6 @@
                 ];
                 Plotly.newPlot(plotDiv, stackedArea(traces), layout);
             });
-            // Refresh the video list
-            $("#Menu").listview('refresh');
         }
 
         function stackedArea(traces) {

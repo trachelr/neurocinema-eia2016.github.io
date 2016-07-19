@@ -49,7 +49,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
 
-    <div id="player"></div>
+    <div id="player" class="row" margin-left="15px" margin-right="15px"></div>
 
     <div id="container" hidden>
         <video id="videoel" width="400" height="300" preload="auto" loop></video>
@@ -81,6 +81,12 @@
         // 4. The API will call this function when the video player is ready.
         function onPlayerReady(event) {
             event.target.playVideo();
+            // write video title in firebase
+            var vidId = videoId.replaceAll('-','')
+            firebase.database().ref('/youtube/' + vidId + '/video').set({
+                title: player.getVideoData().title
+            });
+            drawLoop();
         }
 
         function stopVideo() {
@@ -146,10 +152,11 @@
 
         // build path from viewer_id
         var day = parseInt(viewer_id.replaceAll('-','').split('T')[0]);
-        var data = 'emotions'
-        var path = data + '/youtube/' + videoId + '/' + viewer_id.replaceAll(':','')
+        //var data = 'emotions'
+        var root = 'https://neurocinema-a859d.firebaseio.com/'
+        var path = 'youtube/' + videoId + '/' + viewer_id.replaceAll(':','')
         path = path.replaceAll('-','').replace('.','')
-        var ref = firebase.database().ref(path + '/');
+        var ref = firebase.database().ref(path);
 
         /*********** setup of emotion detection *************/
         var last = ""; //["", "", "", ""];
@@ -161,6 +168,7 @@
 
         for (var i = 0;i < enames.length; i++) {
             enames[i] = enames[i] + '/' + String(nb_view).pad(3)
+            console.log('setting ' + path + '/' + enames[i])
             // send a new data structure into firebase 
             firebase.database().ref(path + '/' + enames[i]).set({
                 localisation: [{
@@ -216,8 +224,8 @@
             }
         }
 
-        function detectEmotionLoop() {
-            requestAnimFrame(detectEmotionLoop);
+        function drawLoop() {
+            requestAnimFrame(drawLoop);
             var cp = ctrack.getCurrentParameters();
             var er = ec.meanPredict(cp);
             // get the current video timestamp
@@ -227,10 +235,10 @@
                 curtime = 0;
             }
             if (er) {
-                //console.log(enames[0] + ': ' + er[0].value + ' at ' + curtime)
+                console.log(er[0].value)
                 for (var i = 0;i < er.length;i++) {
                     if (er[i].value > 0.8) {
-                        //console.log(enames[i] + ': ' + er[i].value)
+                        console.log(enames[i] + ': ' + er[i].value)
                         var minnow = String(curtime / 60).split('.')[0].pad(2);
                         var secnow = String(curtime).split('.')[0].pad(2);
                         var msnow = String(String(curtime).split('.')[1]).substr(0,4)
